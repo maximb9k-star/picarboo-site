@@ -1,0 +1,2582 @@
+{
+ "source": "calcus.ru/calculate/Customs, 22.11.2026, owner=1 (физлицо, личное пользование)",
+ "eurRub": 90.3445,
+ "cases": [
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 1500,
+   "hp": 160,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 789034.56,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 3400.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 1500,
+   "hp": 161,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 789034.56,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 900000.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 1500,
+   "hp": 190,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 789034.56,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 900000.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 1500,
+   "hp": 191,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 789034.56,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 952800.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 1500,
+   "hp": 220,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 789034.56,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 952800.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 1500,
+   "hp": 221,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 789034.56,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 1010400.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 1500,
+   "hp": 250,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 789034.56,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 1010400.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 1500,
+   "hp": 251,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 789034.56,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 1142400.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 1500,
+   "hp": 280,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 789034.56,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 1142400.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 1500,
+   "hp": 281,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 789034.56,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 1291200.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 1500,
+   "hp": 310,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 789034.56,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 1459200.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 1500,
+   "hp": 311,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 789034.56,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 1459200.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 1500,
+   "hp": 340,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 789034.56,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 1459200.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 1500,
+   "hp": 341,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 789034.56,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 1663200.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 1500,
+   "hp": 370,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 789034.56,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 1896000.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 1500,
+   "hp": 371,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 789034.56,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 1896000.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 1500,
+   "hp": 400,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 789034.56,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 1896000.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 2500,
+   "hp": 175,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 1242236.88,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 2306800.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 2500,
+   "hp": 205,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 1242236.88,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 2364000.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 2500,
+   "hp": 235,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 1242236.88,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 2402400.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 2500,
+   "hp": 265,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 1242236.88,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 2520000.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 2500,
+   "hp": 295,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 1242236.88,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 2620800.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 2500,
+   "hp": 325,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 1242236.88,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 2726400.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 2500,
+   "hp": 355,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 1242236.88,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 2834400.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 2500,
+   "hp": 385,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 1242236.88,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 2949600.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 2500,
+   "hp": 415,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 1242236.88,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 3067200.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 2500,
+   "hp": 445,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 1242236.88,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 3189600.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 2500,
+   "hp": 480,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 1242236.88,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 3316800.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 2500,
+   "hp": 550,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 1242236.88,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 3448800.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 1,
+   "cc": 2500,
+   "hp": 175,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 677583.75,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 3456000.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 1,
+   "cc": 2500,
+   "hp": 205,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 677583.75,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 3501600.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 1,
+   "cc": 2500,
+   "hp": 235,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 677583.75,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 3552000.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 1,
+   "cc": 2500,
+   "hp": 265,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 677583.75,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 3660000.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 1,
+   "cc": 2500,
+   "hp": 295,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 677583.75,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 3770400.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 1,
+   "cc": 2500,
+   "hp": 325,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 677583.75,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 3873600.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 1,
+   "cc": 2500,
+   "hp": 355,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 677583.75,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 3981600.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 1,
+   "cc": 2500,
+   "hp": 385,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 677583.75,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 4094400.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 1,
+   "cc": 2500,
+   "hp": 415,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 677583.75,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 4209600.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 1,
+   "cc": 2500,
+   "hp": 445,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 677583.75,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 4327200.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 1,
+   "cc": 2500,
+   "hp": 480,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 677583.75,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 4447200.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 1,
+   "cc": 2500,
+   "hp": 550,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 677583.75,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 4572000.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 3200,
+   "hp": 150,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 1590063.2,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 2584000.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 3200,
+   "hp": 175,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 1590063.2,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 2635200.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 3200,
+   "hp": 205,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 1590063.2,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 2688000.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 3200,
+   "hp": 235,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 1590063.2,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 2743200.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 3200,
+   "hp": 265,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 1590063.2,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 2810400.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 3200,
+   "hp": 295,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 1590063.2,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 2880000.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 3200,
+   "hp": 325,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 1590063.2,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 3038400.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 3200,
+   "hp": 355,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 1590063.2,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 3206400.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 3200,
+   "hp": 385,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 1590063.2,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 3384000.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 3200,
+   "hp": 415,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 1590063.2,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 3568800.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 3200,
+   "hp": 445,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 1590063.2,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 3765600.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 3200,
+   "hp": 480,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 1590063.2,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 3972000.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 3200,
+   "hp": 550,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 1590063.2,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 4190400.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 1,
+   "cc": 3200,
+   "hp": 150,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 1040768.64,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 3956200.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 1,
+   "cc": 3200,
+   "hp": 175,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 1040768.64,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 4000800.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 1,
+   "cc": 3200,
+   "hp": 205,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 1040768.64,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 4044000.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 1,
+   "cc": 3200,
+   "hp": 235,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 1040768.64,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 4087200.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 1,
+   "cc": 3200,
+   "hp": 265,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 1040768.64,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 4144800.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 1,
+   "cc": 3200,
+   "hp": 295,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 1040768.64,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 4248000.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 1,
+   "cc": 3200,
+   "hp": 325,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 1040768.64,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 4356000.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 1,
+   "cc": 3200,
+   "hp": 355,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 1040768.64,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 4485600.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 1,
+   "cc": 3200,
+   "hp": 385,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 1040768.64,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 4620000.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 1,
+   "cc": 3200,
+   "hp": 415,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 1040768.64,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 4759200.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 1,
+   "cc": 3200,
+   "hp": 445,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 1040768.64,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 4900800.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 1,
+   "cc": 3200,
+   "hp": 480,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 1040768.64,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 5049600.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 1,
+   "cc": 3200,
+   "hp": 550,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 1040768.64,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 5200800.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 4000,
+   "hp": 150,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 1987579.0,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 3290600.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 4000,
+   "hp": 175,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 1987579.0,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 3345600.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 4000,
+   "hp": 205,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 1987579.0,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 3403200.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 4000,
+   "hp": 235,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 1987579.0,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 3460800.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 4000,
+   "hp": 265,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 1987579.0,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 3530400.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 4000,
+   "hp": 295,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 1987579.0,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 3600000.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 4000,
+   "hp": 325,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 1987579.0,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 3727200.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 4000,
+   "hp": 355,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 1987579.0,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 3857600.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 4000,
+   "hp": 385,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 1987579.0,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 3993600.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 4000,
+   "hp": 415,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 1987579.0,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 4132800.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 4000,
+   "hp": 445,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 1987579.0,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 4276800.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 4000,
+   "hp": 480,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 1987579.0,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 4425600.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 4000,
+   "hp": 550,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 1987579.0,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 4581600.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 1,
+   "cc": 4000,
+   "hp": 150,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 1300960.8,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 4325800.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 1,
+   "cc": 4000,
+   "hp": 175,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 1300960.8,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 4389600.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 1,
+   "cc": 4000,
+   "hp": 205,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 1300960.8,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 4456800.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 1,
+   "cc": 4000,
+   "hp": 235,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 1300960.8,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 4524000.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 1,
+   "cc": 4000,
+   "hp": 265,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 1300960.8,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 4627200.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 1,
+   "cc": 4000,
+   "hp": 295,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 1300960.8,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 4732800.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 1,
+   "cc": 4000,
+   "hp": 325,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 1300960.8,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 4992000.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 1,
+   "cc": 4000,
+   "hp": 355,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 1300960.8,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 5268000.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 1,
+   "cc": 4000,
+   "hp": 385,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 1300960.8,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 5558400.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 1,
+   "cc": 4000,
+   "hp": 415,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 1300960.8,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 5863200.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 1,
+   "cc": 4000,
+   "hp": 445,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 1300960.8,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 6187200.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 1,
+   "cc": 4000,
+   "hp": 480,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 1300960.8,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 6528000.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 1,
+   "cc": 4000,
+   "hp": 550,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 1300960.8,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 6885600.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 900,
+   "hp": 175,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 789034.56,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 307200.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 900,
+   "hp": 205,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 789034.56,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 316800.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 900,
+   "hp": 235,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 789034.56,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 324000.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 900,
+   "hp": 265,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 789034.56,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 345600.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 900,
+   "hp": 295,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 789034.56,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 345600.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 900,
+   "hp": 325,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 789034.56,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 345600.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 900,
+   "hp": 355,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 789034.56,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 345600.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 900,
+   "hp": 385,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 789034.56,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 345600.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 900,
+   "hp": 415,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 789034.56,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 345600.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 900,
+   "hp": 445,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 789034.56,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 345600.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 900,
+   "hp": 480,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 789034.56,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 345600.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 900,
+   "hp": 550,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 789034.56,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 345600.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 1,
+   "cc": 900,
+   "hp": 175,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 121965.08,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 568800.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 1,
+   "cc": 900,
+   "hp": 205,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 121965.08,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 585600.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 1,
+   "cc": 900,
+   "hp": 235,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 121965.08,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 602400.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 1,
+   "cc": 900,
+   "hp": 265,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 121965.08,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 602400.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 1,
+   "cc": 900,
+   "hp": 295,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 121965.08,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 602400.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 1,
+   "cc": 900,
+   "hp": 325,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 121965.08,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 602400.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 1,
+   "cc": 900,
+   "hp": 355,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 121965.08,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 602400.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 1,
+   "cc": 900,
+   "hp": 385,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 121965.08,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 602400.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 1,
+   "cc": 900,
+   "hp": 415,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 121965.08,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 602400.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 1,
+   "cc": 900,
+   "hp": 445,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 121965.08,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 602400.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 1,
+   "cc": 900,
+   "hp": 480,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 121965.08,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 602400.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 1,
+   "cc": 900,
+   "hp": 550,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 121965.08,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 602400.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 1500,
+   "hp": 265,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 789034.56,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 1142400.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 1500,
+   "hp": 295,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 789034.56,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 1291200.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 1500,
+   "hp": 325,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 789034.56,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 1459200.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 1500,
+   "hp": 355,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 789034.56,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 1663200.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 1500,
+   "hp": 385,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 789034.56,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 1896000.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 1500,
+   "hp": 415,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 789034.56,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 2160000.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 1500,
+   "hp": 445,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 789034.56,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 2464800.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 1500,
+   "hp": 480,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 789034.56,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 2808000.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 1,
+   "cc": 1500,
+   "hp": 550,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 789034.56,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 3201600.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 1,
+   "cc": 1500,
+   "hp": 175,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 230378.47,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 1492800.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 1,
+   "cc": 1500,
+   "hp": 205,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 230378.47,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 1584000.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 1,
+   "cc": 1500,
+   "hp": 235,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 230378.47,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 1677600.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 1,
+   "cc": 1500,
+   "hp": 265,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 230378.47,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 1838400.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 1,
+   "cc": 1500,
+   "hp": 295,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 230378.47,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 2011200.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 1,
+   "cc": 1500,
+   "hp": 325,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 230378.47,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 2203200.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 1,
+   "cc": 1500,
+   "hp": 355,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 230378.47,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 2412000.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 1,
+   "cc": 1500,
+   "hp": 385,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 230378.47,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 2640000.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 1,
+   "cc": 1500,
+   "hp": 415,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 230378.47,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 2892000.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 1,
+   "cc": 1500,
+   "hp": 445,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 230378.47,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 3168000.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 1,
+   "cc": 1500,
+   "hp": 480,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 230378.47,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 3468000.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 1,
+   "cc": 1500,
+   "hp": 550,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 230378.47,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 3796800.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 4,
+   "cc": 0,
+   "hp": 200,
+   "valueRub": 2465733,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 369859.95,
+    "excise": 122600.0,
+    "vat": 650802.45,
+    "util": 2193600.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 4,
+   "cc": 0,
+   "hp": 200,
+   "valueRub": 2465733,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 369859.95,
+    "excise": 122600.0,
+    "vat": 650802.45,
+    "util": 3024000.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 4,
+   "cc": 0,
+   "hp": 70,
+   "valueRub": 2465733,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 369859.95,
+    "excise": 0.0,
+    "vat": 623830.45,
+    "util": 3400.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 6,
+   "cc": 1598,
+   "hp": 180,
+   "valueRub": 2465733,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 1183551.84,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 900000.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 6,
+   "cc": 1598,
+   "hp": 150,
+   "valueRub": 1643822,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 360926.28,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 5200.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 5,
+   "cc": 1598,
+   "hp": 180,
+   "valueRub": 2465733,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 369859.95,
+    "excise": 110340.0,
+    "vat": 648105.25,
+    "util": 1848000.0
+   }
+  },
+  {
+   "age": "5-7",
+   "engine": 1,
+   "cc": 1999,
+   "hp": 150,
+   "valueRub": 821911,
+   "expected": {
+    "clearanceFee": 4924.0,
+    "duty": 866873.55,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 5200.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 4,
+   "cc": 0,
+   "hp": 80,
+   "valueRub": 2465733,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 369859.95,
+    "excise": 0.0,
+    "vat": 623830.45,
+    "util": 3400.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 4,
+   "cc": 0,
+   "hp": 81,
+   "valueRub": 2465733,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 369859.95,
+    "excise": 0.0,
+    "vat": 623830.45,
+    "util": 991200.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 4,
+   "cc": 0,
+   "hp": 100,
+   "valueRub": 2465733,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 369859.95,
+    "excise": 6400.0,
+    "vat": 625238.45,
+    "util": 991200.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 4,
+   "cc": 0,
+   "hp": 130,
+   "valueRub": 2465733,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 369859.95,
+    "excise": 8320.0,
+    "vat": 625660.85,
+    "util": 1560000.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 4,
+   "cc": 0,
+   "hp": 175,
+   "valueRub": 2465733,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 369859.95,
+    "excise": 107275.0,
+    "vat": 647430.95,
+    "util": 1848000.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 4,
+   "cc": 0,
+   "hp": 205,
+   "valueRub": 2465733,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 369859.95,
+    "excise": 205820.0,
+    "vat": 669110.85,
+    "util": 2193600.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 4,
+   "cc": 0,
+   "hp": 235,
+   "valueRub": 2465733,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 369859.95,
+    "excise": 235940.0,
+    "vat": 675737.25,
+    "util": 2599200.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 4,
+   "cc": 0,
+   "hp": 265,
+   "valueRub": 2465733,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 369859.95,
+    "excise": 266060.0,
+    "vat": 682363.65,
+    "util": 3079200.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 4,
+   "cc": 0,
+   "hp": 295,
+   "valueRub": 2465733,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 369859.95,
+    "excise": 296180.0,
+    "vat": 688990.05,
+    "util": 3648000.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 4,
+   "cc": 0,
+   "hp": 325,
+   "valueRub": 2465733,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 369859.95,
+    "excise": 556075.0,
+    "vat": 746166.95,
+    "util": 3648000.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 4,
+   "cc": 0,
+   "hp": 355,
+   "valueRub": 2465733,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 369859.95,
+    "excise": 607405.0,
+    "vat": 757459.55,
+    "util": 3648000.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 4,
+   "cc": 0,
+   "hp": 385,
+   "valueRub": 2465733,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 369859.95,
+    "excise": 658735.0,
+    "vat": 768752.15,
+    "util": 3648000.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 4,
+   "cc": 0,
+   "hp": 415,
+   "valueRub": 2465733,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 369859.95,
+    "excise": 734965.0,
+    "vat": 785522.75,
+    "util": 3648000.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 4,
+   "cc": 0,
+   "hp": 445,
+   "valueRub": 2465733,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 369859.95,
+    "excise": 788095.0,
+    "vat": 797211.35,
+    "util": 3648000.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 4,
+   "cc": 0,
+   "hp": 480,
+   "valueRub": 2465733,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 369859.95,
+    "excise": 850080.0,
+    "vat": 810848.05,
+    "util": 3648000.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 4,
+   "cc": 0,
+   "hp": 550,
+   "valueRub": 2465733,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 369859.95,
+    "excise": 1005950.0,
+    "vat": 845139.45,
+    "util": 3648000.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 4,
+   "cc": 0,
+   "hp": 80,
+   "valueRub": 2465733,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 369859.95,
+    "excise": 0.0,
+    "vat": 623830.45,
+    "util": 5200.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 4,
+   "cc": 0,
+   "hp": 81,
+   "valueRub": 2465733,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 369859.95,
+    "excise": 0.0,
+    "vat": 623830.45,
+    "util": 1641600.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 4,
+   "cc": 0,
+   "hp": 100,
+   "valueRub": 2465733,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 369859.95,
+    "excise": 6400.0,
+    "vat": 625238.45,
+    "util": 1641600.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 4,
+   "cc": 0,
+   "hp": 130,
+   "valueRub": 2465733,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 369859.95,
+    "excise": 8320.0,
+    "vat": 625660.85,
+    "util": 2227200.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 4,
+   "cc": 0,
+   "hp": 175,
+   "valueRub": 2465733,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 369859.95,
+    "excise": 107275.0,
+    "vat": 647430.95,
+    "util": 2594400.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 4,
+   "cc": 0,
+   "hp": 205,
+   "valueRub": 2465733,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 369859.95,
+    "excise": 205820.0,
+    "vat": 669110.85,
+    "util": 3024000.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 4,
+   "cc": 0,
+   "hp": 235,
+   "valueRub": 2465733,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 369859.95,
+    "excise": 235940.0,
+    "vat": 675737.25,
+    "util": 3523200.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 4,
+   "cc": 0,
+   "hp": 265,
+   "valueRub": 2465733,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 369859.95,
+    "excise": 266060.0,
+    "vat": 682363.65,
+    "util": 4104000.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 4,
+   "cc": 0,
+   "hp": 295,
+   "valueRub": 2465733,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 369859.95,
+    "excise": 296180.0,
+    "vat": 688990.05,
+    "util": 4780800.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 4,
+   "cc": 0,
+   "hp": 325,
+   "valueRub": 2465733,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 369859.95,
+    "excise": 556075.0,
+    "vat": 746166.95,
+    "util": 4780800.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 4,
+   "cc": 0,
+   "hp": 355,
+   "valueRub": 2465733,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 369859.95,
+    "excise": 607405.0,
+    "vat": 757459.55,
+    "util": 4780800.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 4,
+   "cc": 0,
+   "hp": 385,
+   "valueRub": 2465733,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 369859.95,
+    "excise": 658735.0,
+    "vat": 768752.15,
+    "util": 4780800.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 4,
+   "cc": 0,
+   "hp": 415,
+   "valueRub": 2465733,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 369859.95,
+    "excise": 734965.0,
+    "vat": 785522.75,
+    "util": 4780800.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 4,
+   "cc": 0,
+   "hp": 445,
+   "valueRub": 2465733,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 369859.95,
+    "excise": 788095.0,
+    "vat": 797211.35,
+    "util": 4780800.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 4,
+   "cc": 0,
+   "hp": 480,
+   "valueRub": 2465733,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 369859.95,
+    "excise": 850080.0,
+    "vat": 810848.05,
+    "util": 4780800.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 4,
+   "cc": 0,
+   "hp": 550,
+   "valueRub": 2465733,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 369859.95,
+    "excise": 1005950.0,
+    "vat": 845139.45,
+    "util": 4780800.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 2,
+   "cc": 2151,
+   "hp": 210,
+   "valueRub": 2465733,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 1183551.84,
+    "excise": 0.0,
+    "vat": 0.0,
+    "util": 2364000.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 4,
+   "cc": 0,
+   "hp": 115,
+   "valueRub": 2465733,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 369859.95,
+    "excise": 7360.0,
+    "vat": 625449.65,
+    "util": 1317600.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 4,
+   "cc": 0,
+   "hp": 145,
+   "valueRub": 2465733,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 369859.95,
+    "excise": 9280.0,
+    "vat": 625872.05,
+    "util": 1560000.0
+   }
+  },
+  {
+   "age": "0-3",
+   "engine": 4,
+   "cc": 0,
+   "hp": 160,
+   "valueRub": 2465733,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 369859.95,
+    "excise": 98080.0,
+    "vat": 645408.05,
+    "util": 1560000.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 4,
+   "cc": 0,
+   "hp": 115,
+   "valueRub": 2465733,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 369859.95,
+    "excise": 7360.0,
+    "vat": 625449.65,
+    "util": 1912800.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 4,
+   "cc": 0,
+   "hp": 145,
+   "valueRub": 2465733,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 369859.95,
+    "excise": 9280.0,
+    "vat": 625872.05,
+    "util": 2227200.0
+   }
+  },
+  {
+   "age": "3-5",
+   "engine": 4,
+   "cc": 0,
+   "hp": 160,
+   "valueRub": 2465733,
+   "expected": {
+    "clearanceFee": 13541.0,
+    "duty": 369859.95,
+    "excise": 98080.0,
+    "vat": 645408.05,
+    "util": 2227200.0
+   }
+  }
+ ]
+}
