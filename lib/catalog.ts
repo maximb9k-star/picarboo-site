@@ -47,7 +47,7 @@ export const SORTS: { key: SortKey; label: string }[] = [
 ];
 
 const ORDER: Record<SortKey, string> = {
-  new: '(c.price_rub is null), c.modified_at desc nulls last, c.id desc',
+  new: '(c.price_rub is null), coalesce(c.modified_at, c.first_seen_at) desc, c.id desc',
   price_asc: 'c.price_rub asc nulls last, c.id',
   price_desc: 'c.price_rub desc nulls last, c.id',
   year_desc: 'c.year_month desc, c.id',
@@ -206,7 +206,7 @@ export async function catalogStats(): Promise<{ total: number; today: number }> 
 export async function latestCars(limit = 8): Promise<CarCard[]> {
   return query<CarCard>(
     `select ${CARD_COLUMNS} from cars c left join specs s on s.key = c.spec_key
-     where c.active and c.price_rub is not null order by c.modified_at desc nulls last limit $1`,
+     where c.active and c.price_rub is not null order by coalesce(c.modified_at, c.first_seen_at) desc limit $1`,
     [limit],
   );
 }

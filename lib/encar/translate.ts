@@ -144,8 +144,22 @@ const PHRASE_RULES: [RegExp | string, string][] = PHRASES.map(([k, v]) =>
   HANGUL_ONLY.test(k) && k.length <= 2 && !SUFFIXES.has(k) ? [new RegExp(`(^|[\\s(/])${escapeRe(k)}(?=$|[\\s)/])`, 'g'), `$1${v}`] : [k, v],
 );
 
+// Названия повторяются тысячи раз — кэшируем результат для текущего справочника.
+let cacheFor: Record<string, string> | null = null;
+const cache = new Map<string, string>();
+
 export function translateName(ko: string | null | undefined, extra: Record<string, string> = {}): string {
   if (!ko) return '';
+  if (cacheFor !== extra) { cache.clear(); cacheFor = extra; }
+  const hit = cache.get(ko);
+  if (hit !== undefined) return hit;
+  const out = translateUncached(ko, extra);
+  if (cache.size > 50_000) cache.clear();
+  cache.set(ko, out);
+  return out;
+}
+
+function translateUncached(ko: string, extra: Record<string, string>): string {
   // «뉴SM5», «더뉴K5» — слитное написание перед латиницей
   let s = ko.replace(/(^|[\s(])(?:더\s?)?뉴(?=[A-Za-z0-9])/g, (m, pre: string) => `${pre}${m.includes('더') ? 'The New ' : 'New '}`);
   for (const [k, v] of PHRASE_RULES) s = typeof k === 'string' ? s.split(k).join(v) : s.replace(k, v);

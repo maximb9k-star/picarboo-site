@@ -72,6 +72,7 @@ export async function fetchFacets(q: string): Promise<ListResponse> {
 
 export interface EncarVehicle {
   vehicleId: number;
+  manage?: { firstAdvertisedDateTime?: string; modifyDateTime?: string; registDateTime?: string };
   vehicleNo?: string;
   vin?: string;
   category: {

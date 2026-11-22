@@ -133,7 +133,7 @@ export async function upsertList(rows: CarListRow[]): Promise<void> {
        manufacturer = excluded.manufacturer, model = excluded.model, badge = excluded.badge,
        mileage = excluded.mileage, photo_path = excluded.photo_path,
        photos = case when cars.detail_fetched_at is null then excluded.photos else cars.photos end,
-       city = excluded.city, modified_at = excluded.modified_at,
+       city = excluded.city, modified_at = coalesce(excluded.modified_at, cars.modified_at),
        price_calc_at = case when cars.price_krw <> excluded.price_krw then null else cars.price_calc_at end,
        price_krw = excluded.price_krw,
        last_seen_at = now(), active = true`,
@@ -141,39 +141,108 @@ export async function upsertList(rows: CarListRow[]): Promise<void> {
   );
 }
 
-// full=true — полный проход с пометкой исчезнувших объявлений; иначе — первые страницы до уже известных.
-export async function syncList(full: boolean): Promise<{ seen: number; total: number; deactivated: number }> {
+// Encar сортирует нестабильно (у тысяч объявлений одинаковое время изменения), поэтому постраничный
+// обход теряет и дублирует машины. Полный проход делит каталог по цене, затем по пробегу, пока каждый
+// кусок не поместится в один запрос (до 500 шт.) — так каждая машина видна ровно один раз.
+const SLICE_LIMIT = 500;
+
+interface Slice { p: [number, number]; m: [number, number] }
+
+export function sliceQuery(s: Slice): string {
+  return `(And.Hidden.N._.CarType.A._.SellType.일반._.Price.range(${s.p[0]}..${s.p[1]})._.Mileage.range(${s.m[0]}..${s.m[1]}).)`;
+}
+
+export function splitSlice(s: Slice): Slice[] | null {
+  if (s.p[0] < s.p[1]) {
+    const mid = Math.floor((s.p[0] + s.p[1]) / 2);
+    return [{ p: [s.p[0], mid], m: s.m }, { p: [mid + 1, s.p[1]], m: s.m }];
+  }
+  if (s.m[0] < s.m[1]) {
+    const mid = Math.floor((s.m[0] + s.m[1]) / 2);
+    return [{ p: s.p, m: [s.m[0], mid] }, { p: s.p, m: [mid + 1, s.m[1]] }];
+  }
+  return null;
+}
+
+export async function syncFull(concurrency = 4): Promise<{ seen: number; total: number; requests: number; deactivated: number }> {
   const names = await loadNames();
   const started = new Date();
-  const pageSize = 200;
-  let offset = 0;
-  let total = 0;
-  let seen = 0;
-  let unchangedPages = 0;
-  for (;;) {
-    const r = await fetchList(BASE_QUERY, offset, pageSize);
-    total = r.Count;
-    const rows = r.SearchResults.map((it) => mapListItem(it, names)).filter((x): x is CarListRow => x != null);
-    if (!full && rows.length) {
-      const known = await query<{ n: number }>(
-        'select count(*)::int as n from cars where id = any($1::bigint[]) and modified_at >= $2::timestamptz',
-        [rows.map((x) => x.id), rows[rows.length - 1]!.modified_at],
-      );
-      unchangedPages = (known[0]?.n ?? 0) >= rows.length ? unchangedPages + 1 : 0;
+  const total = (await fetchList(BASE_QUERY, 0, 1)).Count;
+  const ids = new Set<number>();
+  const queue: Slice[] = [{ p: [0, 999_999], m: [0, 9_999_999] }];
+  let requests = 0;
+  let failed = 0;
+  let active = 0;
+
+  async function worker(): Promise<void> {
+    for (;;) {
+      const s = queue.shift();
+      if (!s) {
+        if (active === 0) return;
+        await sleep(100);
+        continue;
+      }
+      active++;
+      try {
+        const r = await fetchList(sliceQuery(s), 0, SLICE_LIMIT);
+        requests++;
+        const parts = r.Count > r.SearchResults.length ? splitSlice(s) : null;
+        if (parts) {
+          queue.push(...parts);
+        } else {
+          for (const it of r.SearchResults) ids.add(Number(it.Id));
+          const rows = r.SearchResults.map((it) => mapListItem(it, names)).filter((x): x is CarListRow => x != null);
+          await upsertList([...new Map(rows.map((x) => [x.id, x])).values()]);
+        }
+      } catch (e) {
+        failed++;
+        console.error('slice', JSON.stringify(s), String(e));
+      } finally {
+        active--;
+      }
+      if (requests % 200 === 0) console.log(`list_full: ${ids.size} / ${total}, запросов ${requests}`);
+      await sleep(150);
     }
-    await upsertList(rows);
-    seen += r.SearchResults.length;
-    offset += pageSize;
-    if (!r.SearchResults.length || offset >= total) break;
-    if (!full && unchangedPages >= 2) break;
-    await sleep(300);
   }
+  await Promise.all(Array.from({ length: concurrency }, worker));
+
+  // Снятые с продажи скрываем только если обошли почти весь каталог без ошибок.
   let deactivated = 0;
-  if (full && seen >= total * 0.95) {
+  if (failed === 0 && ids.size >= total * 0.97) {
     const res = await getPool().query('update cars set active = false where active and last_seen_at < $1', [started]);
     deactivated = res.rowCount ?? 0;
   }
-  return { seen, total, deactivated };
+  return { seen: ids.size, total, requests, deactivated };
+}
+
+// Новые и изменённые объявления: первые страницы по дате изменения, пока не пойдут уже известные.
+export async function syncList(): Promise<{ seen: number; total: number }> {
+  const names = await loadNames();
+  const pageSize = 200;
+  let seen = 0;
+  let total = 0;
+  let unchangedPages = 0;
+  for (let offset = 0; offset < 20_000; offset += pageSize) {
+    const r = await fetchList(BASE_QUERY, offset, pageSize);
+    total = r.Count;
+    if (!r.SearchResults.length) break;
+    const rows = r.SearchResults.map((it) => mapListItem(it, names)).filter((x): x is CarListRow => x != null);
+    if (rows.length) {
+      // id на странице могут повторяться (нестабильная сортировка Encar) — сравниваем уникальные.
+      // Дат в выдаче нет: страница «не изменилась», если все машины уже есть в базе с той же ценой.
+      const unique = [...new Map(rows.map((x) => [x.id, x])).values()];
+      const known = await query<{ n: number }>(
+        'select count(*)::int as n from cars c join unnest($1::bigint[], $2::bigint[]) as v(id, p) on c.id = v.id where c.price_krw = v.p and c.active',
+        [unique.map((x) => x.id), unique.map((x) => x.price_krw)],
+      );
+      unchangedPages = (known[0]?.n ?? 0) >= unique.length ? unchangedPages + 1 : 0;
+    }
+    await upsertList([...new Map(rows.map((x) => [x.id, x])).values()]);
+    seen += r.SearchResults.length;
+    if (unchangedPages >= 2) break;
+    await sleep(300);
+  }
+  return { seen, total };
 }
 
 // ---------- Детали ----------
@@ -181,7 +250,7 @@ export async function syncList(full: boolean): Promise<{ seen: number; total: nu
 export async function syncDetails(limit = 200, concurrency = 3): Promise<{ done: number; gone: number }> {
   const names = await loadNames();
   const cars = await query<{ id: number }>(
-    'select id from cars where active and detail_fetched_at is null order by modified_at desc nulls last limit $1',
+    'select id from cars where active and detail_fetched_at is null order by first_seen_at desc, id desc limit $1',
     [limit],
   );
   let done = 0;
@@ -228,11 +297,12 @@ export async function fetchAndSaveDetail(id: number, names?: Record<string, stri
        seats = $8, vin = $9, vehicle_no = $10, options = $11, awd = awd or $12, accident_cnt = $13, insurance_krw = $14,
        owner_changes = $15, damaged_parts = $16, detail = $17, detail_fetched_at = now(), spec_key = $18, price_calc_at = null,
        photos = case when jsonb_array_length($19::jsonb) > 0 then $19::jsonb else photos end,
-       transmission = coalesce($20, transmission)
+       transmission = coalesce($20, transmission),
+       modified_at = coalesce($21::timestamptz, modified_at)
      where id = $1`,
     [id, d.vehicle_id, d.model_group_ko, d.model_group, d.displacement, d.color, d.body, d.seats, d.vin, d.vehicle_no,
       JSON.stringify(d.options), d.awd, d.accident_cnt, d.insurance_krw, d.owner_changes, d.damaged_parts, JSON.stringify(d.detail), key,
-      JSON.stringify(d.photos), d.transmission],
+      JSON.stringify(d.photos), d.transmission, d.listed_at],
   );
 }
 

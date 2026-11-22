@@ -86,6 +86,7 @@ export interface CarDetailRow {
   damaged_parts: number | null;
   photos: string[];
   transmission: string | null;
+  listed_at: string | null;
   detail: CarDetailJson;
 }
 
@@ -141,6 +142,7 @@ export function mapDetail(v: EncarVehicle, rec: EncarRecord | null, ins: EncarIn
     insurance_krw: rec ? (rec.myAccidentCost ?? 0) + (rec.otherAccidentCost ?? 0) : null,
     owner_changes: rec?.ownerChangeCnt ?? null,
     damaged_parts: parts ? parts.length : null,
+    listed_at: kstToIso(v.manage?.firstAdvertisedDateTime ?? v.manage?.registDateTime),
     photos: [...new Set((v.photos ?? []).slice().sort((a, b) => a.code.localeCompare(b.code)).map((ph) => ph.path))],
     transmission: v.spec.transmissionName ? (TRANSMISSIONS[v.spec.transmissionName] ?? translateName(v.spec.transmissionName)) : null,
     detail: {
@@ -201,3 +203,9 @@ export const CITIES: Record<string, string> = {
   '경북': 'Кёнсан-Пукто', '경남': 'Кёнсан-Намдо', '제주': 'Чеджу', '전남광주': 'Кванджу', '대구경북': 'Тэгу', '부산경남': 'Пусан',
   '대전충남': 'Тэджон', '전북전주': 'Чонджу',
 };
+
+// "2026-10-02T21:20:58" (время Кореи без пояса) → ISO с +09:00
+export function kstToIso(s: string | null | undefined): string | null {
+  if (!s || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(s)) return null;
+  return `${s.slice(0, 19)}+09:00`;
+}
