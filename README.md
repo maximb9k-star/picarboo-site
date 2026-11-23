@@ -35,9 +35,31 @@
 
 **Первый запуск:** список (~195 000 машин) загружается за 10–20 минут, а детали — постепенно, около 1–2 суток. Машины появляются в каталоге по мере загрузки деталей, свежие — первыми.
 
-## Запуск на сервере (российский VPS)
+## Запуск на сервере
 
-Подойдёт любой VPS с Ubuntu 22/24: 2 ядра, 4 ГБ памяти, 40 ГБ диска (Timeweb Cloud, Selectel, Beget и т.п.).
+Нужен любой сервер с Ubuntu 22/24: от 2 ядер, 4 ГБ памяти, 40 ГБ диска. Российский не обязателен.
+
+| Вариант | Цена | Оплата |
+|---|---|---|
+| **Oracle Cloud Always Free, регион Seoul или Chuncheon** (рекомендуется) | 0 ₽ навсегда: 4 ядра ARM, 24 ГБ памяти, 200 ГБ диска | корейская или любая зарубежная карта (только для проверки) |
+| Hetzner CX22 (Германия/Финляндия) | ~€4–5 в месяц | зарубежная карта |
+| Vultr / AWS Lightsail, регион Seoul | ~$6–10 в месяц | зарубежная карта |
+
+### Oracle Cloud Free — пошагово
+
+1. Зарегистрируйтесь на oracle.com/cloud/free. **Домашний регион — South Korea Central (Seoul) или South Korea North (Chuncheon)**: сменить его потом нельзя. Корейский IP сервера ещё и удобен для Encar.
+2. После регистрации переведите аккаунт на **Pay As You Go** (Billing → Upgrade). Пока вы в бесплатных лимитах, списаний нет, зато Oracle не отключит «простаивающий» бесплатный сервер.
+3. Compute → Instances → Create instance:
+   - Image: **Ubuntu 24.04**; Shape: **Ampere → VM.Standard.A1.Flex**, 4 OCPU, 24 GB;
+   - Add SSH keys → «Generate a key pair» и скачайте приватный ключ;
+   - если пишет «Out of capacity» — повторите через несколько часов или выберите другой Availability Domain.
+4. Откройте порты 80 и 443: Instance → Subnet → Security List → Add Ingress Rules: Source `0.0.0.0/0`, TCP, порты `80,443`.
+5. Подключитесь (`ssh -i ключ ubuntu@IP`) и откройте порты в системном фаерволе Ubuntu (в образах Oracle они закрыты):
+   ```bash
+   sudo iptables -I INPUT 6 -p tcp -m multiport --dports 80,443 -m state --state NEW -j ACCEPT
+   sudo netfilter-persistent save
+   ```
+6. Дальше — общие шаги ниже (Docker, `.env`, `docker compose up`).
 
 1. **Домен.** Купите `picarboo.ru` и в DNS создайте A‑записи `picarboo.ru` и `www.picarboo.ru` → IP сервера.
 2. **Docker.** На сервере:
