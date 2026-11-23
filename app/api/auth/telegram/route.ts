@@ -1,10 +1,11 @@
 import { NextResponse } from 'next/server';
 import { checkTelegramAuth, sign, COOKIE_NAMES } from '@/lib/session';
 import { query } from '@/lib/db';
+import { getTelegramConfig } from '@/lib/telegram';
 
 export async function GET(req: Request) {
   const url = new URL(req.url);
-  const token = process.env.TELEGRAM_BOT_TOKEN;
+  const { token } = await getTelegramConfig();
   const next = url.searchParams.get('next') || '/';
   const safeNext = next.startsWith('/') && !next.startsWith('//') ? next : '/';
   const data: Record<string, string> = {};

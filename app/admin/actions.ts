@@ -66,3 +66,53 @@ export async function setSpecHp(form: FormData): Promise<void> {
   await query('update cars set price_calc_at = null where spec_key = $1', [key]);
   revalidatePath('/admin');
 }
+
+export async function saveDomains(form: FormData): Promise<void> {
+  await guard();
+  const v = String(form.get('domains') ?? '').toLowerCase().split(/[\s,]+/).map((d) => d.replace(/^https?:\/\//, '').replace(/\/.*$/, '')).filter(Boolean).join(', ');
+  await query(
+    `insert into settings (key, value, updated_at) values ('site_domains', $1::jsonb, now())
+     on conflict (key) do update set value = excluded.value, updated_at = now()`,
+    [JSON.stringify(v)],
+  );
+  revalidatePath('/admin');
+  redirect('/admin?saved=1');
+}
+
+export async function saveTelegram(form: FormData): Promise<void> {
+  await guard();
+  const set = async (key: string, v: string) => {
+    await query(
+      `insert into settings (key, value, updated_at) values ($1, $2::jsonb, now())
+       on conflict (key) do update set value = excluded.value, updated_at = now()`,
+      [key, JSON.stringify(v)],
+    );
+  };
+  const token = String(form.get('token') ?? '').trim();
+  if (token) await set('telegram_bot_token', token); // пустое поле — оставить прежний токен
+  await set('telegram_bot_username', String(form.get('username') ?? '').trim().replace(/^@/, ''));
+  await set('telegram_admin_chat_id', String(form.get('chatId') ?? '').trim());
+  const { notifyAdmin } = await import('@/lib/telegram');
+  const ok = await notifyAdmin('✅ PICARBOO: бот подключён, заявки будут приходить сюда.');
+  revalidatePath('/admin');
+  redirect(ok ? '/admin?tg=ok' : '/admin?tg=fail');
+}
+
+// chat_id последнего, кто написал боту, — чтобы не искать его вручную.
+export async function detectChatId(): Promise<void> {
+  await guard();
+  const { getTelegramConfig } = await import('@/lib/telegram');
+  const { token } = await getTelegramConfig();
+  if (!token) redirect('/admin?tg=notoken');
+  const r = await fetch(`https://api.telegram.org/bot${token}/getUpdates`, { cache: 'no-store' }).then((x) => x.json()).catch(() => null) as
+    { result?: { message?: { chat?: { id?: number } } }[] } | null;
+  const id = r?.result?.reverse().find((u) => u.message?.chat?.id)?.message?.chat?.id;
+  if (!id) redirect('/admin?tg=nochat');
+  await query(
+    `insert into settings (key, value, updated_at) values ('telegram_admin_chat_id', $1::jsonb, now())
+     on conflict (key) do update set value = excluded.value, updated_at = now()`,
+    [JSON.stringify(String(id))],
+  );
+  revalidatePath('/admin');
+  redirect('/admin?tg=chat');
+}

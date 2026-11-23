@@ -1,8 +1,6 @@
 // Запросы каталога: фильтры, сортировка, карточка авто.
 import { query } from './db';
 import type { Fuel } from './encar/translate';
-import type { PriceBreakdown } from './pricing/price';
-import type { CarDetailJson } from './encar/map';
 
 export const PAGE_SIZE = 24;
 
@@ -98,7 +96,7 @@ export function buildWhere(f: CatalogFilters): { sql: string; params: unknown[] 
   if (f.hpMax != null) where.push(`${HP_EXPR} <= ${p(f.hpMax)}`);
   if (f.awd) where.push('c.awd');
   if (f.lowUtil) where.push(`${HP_EXPR} <= 160 and c.displacement <= 3000 and c.fuel not in ('electric','hydrogen')`);
-  if (f.passable) where.push(`c.price_calc->>'ageGroup' = '3to5'`);
+  if (f.passable) where.push(`c.age_group = '3to5'`);
   if (f.noAccidents) where.push('c.accident_cnt = 0');
   else if (f.accidentsMax != null) where.push(`c.accident_cnt <= ${p(f.accidentsMax)}`);
   if (f.insuranceMaxKrw != null) where.push(`c.insurance_krw <= ${p(f.insuranceMaxKrw)}`);
@@ -114,8 +112,7 @@ export function buildWhere(f: CatalogFilters): { sql: string; params: unknown[] 
 }
 
 const CARD_COLUMNS = `c.id, c.manufacturer, c.model, c.badge, c.fuel, c.year_month, c.mileage, c.displacement, ${HP_EXPR} as hp, c.awd,
-  c.price_krw, c.price_rub, c.photo_path, c.price_calc->>'ageGroup' as age_group,
-  (c.price_calc->>'monthsToNextGroup')::int as months_to_next, c.accident_cnt, c.first_seen_at`;
+  c.price_krw, c.price_rub, c.photo_path, c.age_group, c.months_to_next, c.accident_cnt, c.first_seen_at`;
 
 export async function searchCars(f: CatalogFilters, sort: SortKey, page: number): Promise<{ cars: CarCard[]; total: number }> {
   const { sql, params } = buildWhere(f);
@@ -172,10 +169,8 @@ export interface CarFull extends CarCard {
   seats: number | null;
   vin: string | null;
   vehicle_no: string | null;
+  vehicle_id: number | null;
   photos: string[];
-  options: string[] | null;
-  detail: CarDetailJson | null;
-  price_calc: PriceBreakdown | null;
   insurance_krw: number | null;
   damaged_parts: number | null;
   owner_changes: number | null;
@@ -187,8 +182,8 @@ export interface CarFull extends CarCard {
 
 export async function getCar(id: number): Promise<CarFull | null> {
   const rows = await query<CarFull>(
-    `select ${CARD_COLUMNS}, c.model_group, c.transmission, c.form_year, c.color, c.body, c.seats, c.vin, c.vehicle_no, c.photos, c.options,
-       c.detail, c.price_calc, c.insurance_krw, c.damaged_parts, c.owner_changes, s.status as spec_status, c.city, c.modified_at, c.active
+    `select ${CARD_COLUMNS}, c.model_group, c.transmission, c.form_year, c.color, c.body, c.seats, c.vin, c.vehicle_no, c.vehicle_id, c.photos,
+       c.insurance_krw, c.damaged_parts, c.owner_changes, s.status as spec_status, c.city, c.modified_at, c.active
      from cars c left join specs s on s.key = c.spec_key where c.id = $1`,
     [id],
   );

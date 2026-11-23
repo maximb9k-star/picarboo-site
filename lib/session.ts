@@ -58,6 +58,10 @@ export function checkTelegramAuth(data: Record<string, string>, botToken: string
   return Number.isFinite(authDate) && Date.now() / 1000 - authDate < maxAgeSec;
 }
 
-export function loginConfigured(): boolean {
-  return !!(process.env.TELEGRAM_BOT_TOKEN && process.env.TELEGRAM_BOT_USERNAME && process.env.SESSION_SECRET);
+// Имя бота для виджета входа или null, если вход не настроен.
+export async function loginBot(): Promise<string | null> {
+  if (!process.env.SESSION_SECRET) return null;
+  const { getTelegramConfig } = await import('./telegram');
+  const c = await getTelegramConfig();
+  return c.token && c.username ? c.username : null;
 }

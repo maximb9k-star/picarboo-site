@@ -28,10 +28,10 @@
 | Фоновый процесс (обновление каталога, курсов, цен) | `worker/` |
 | База данных | `db/migrations/` |
 
-Фоновый процесс:
+Фоновый процесс (`lib/jobs.ts`, «тики» до минуты; состояние в базе, можно прерывать):
 - курсы — раз в час, затем пересчёт всех цен;
-- новые объявления — каждые 10 минут; полный проход каталога — раз в 3 часа: каталог делится по цене и пробегу на куски до 500 машин, потому что постраничная выдача Encar нестабильна. Снятые с продажи скрываются, только если обход покрыл ≥97% каталога без ошибок;
-- детали машин (страховая история, лист осмотра, опции) и мощности — непрерывно.
+- новые объявления — каждую минуту; полный проход каталога — раз в сутки: каталог делится по цене и пробегу на куски до 500 машин, потому что постраничная выдача Encar нестабильна. Снятые с продажи скрываются, только если обход покрыл ≥97% каталога без ошибок;
+- детали машин (объём, ДТП, повреждения для фильтров) и мощности — непрерывно. Фото, страховая история, лист осмотра и опции на странице авто берутся с Encar вживую (кэш 1 час), поэтому база маленькая (~150 МБ на весь каталог).
 
 **Первый запуск:** список (~195 000 машин) загружается за 10–20 минут, а детали — постепенно, около 1–2 суток. Машины появляются в каталоге по мере загрузки деталей, свежие — первыми.
 
@@ -45,37 +45,33 @@
 | Hetzner CX22 (Германия/Финляндия) | ~€4–5 в месяц | зарубежная карта |
 | Vultr / AWS Lightsail, регион Seoul | ~$6–10 в месяц | зарубежная карта |
 
-### Oracle Cloud Free — пошагово
+### Oracle Cloud Free — пошагово (без входа на сервер)
 
-1. Зарегистрируйтесь на oracle.com/cloud/free. **Домашний регион — South Korea Central (Seoul) или South Korea North (Chuncheon)**: сменить его потом нельзя. Корейский IP сервера ещё и удобен для Encar.
-2. После регистрации переведите аккаунт на **Pay As You Go** (Billing → Upgrade). Пока вы в бесплатных лимитах, списаний нет, зато Oracle не отключит «простаивающий» бесплатный сервер.
-3. Compute → Instances → Create instance:
-   - Image: **Ubuntu 24.04**; Shape: **Ampere → VM.Standard.A1.Flex**, 4 OCPU, 24 GB;
-   - Add SSH keys → «Generate a key pair» и скачайте приватный ключ;
-   - если пишет «Out of capacity» — повторите через несколько часов или выберите другой Availability Domain.
-4. Откройте порты 80 и 443: Instance → Subnet → Security List → Add Ingress Rules: Source `0.0.0.0/0`, TCP, порты `80,443`.
-5. Подключитесь (`ssh -i ключ ubuntu@IP`) и откройте порты в системном фаерволе Ubuntu (в образах Oracle они закрыты):
-   ```bash
-   sudo iptables -I INPUT 6 -p tcp -m multiport --dports 80,443 -m state --state NEW -j ACCEPT
-   sudo netfilter-persistent save
-   ```
-6. Дальше — общие шаги ниже (Docker, `.env`, `docker compose up`).
+Сервер настраивается сам скриптом `deploy/oracle-cloud-init.sh`: ставит Docker, скачивает код из GitHub,
+создаёт `.env` со случайными паролями, запускает сайт и каждые 10 минут подтягивает обновления из ветки `main`.
 
-1. **Домен.** Купите `picarboo.ru` и в DNS создайте A‑записи `picarboo.ru` и `www.picarboo.ru` → IP сервера.
-2. **Docker.** На сервере:
-   ```bash
-   curl -fsSL https://get.docker.com | sh
-   git clone <адрес репозитория> picarboo && cd picarboo
-   cp .env.example .env && nano .env
-   ```
-3. **Заполните `.env`:** `DOMAIN`, `POSTGRES_PASSWORD` (любой длинный пароль), `SITE_URL=https://picarboo.ru`, `ADMIN_PASSWORD`, `SESSION_SECRET` (случайная строка: `openssl rand -hex 32`), данные бота (ниже).
-4. **Запуск:** `docker compose up -d --build`. HTTPS-сертификат выпустится автоматически.
-5. Откройте `https://picarboo.ru/admin`, проверьте курсы и ход загрузки.
+1. Зарегистрируйтесь на oracle.com/cloud/free. **Домашний регион — South Korea Central (Seoul) или South Korea North (Chuncheon)**, сменить его потом нельзя.
+2. Billing → Upgrade to **Pay As You Go** (в бесплатных лимитах списаний нет, но Oracle не отключит «простаивающий» сервер).
+3. Compute → Instances → **Create instance**:
+   - Image: **Canonical Ubuntu 24.04**; Shape: **Ampere → VM.Standard.A1.Flex**, 4 OCPU, 24 GB;
+   - Networking: «Create new virtual cloud network», **Assign a public IPv4 address** — включено;
+   - SSH keys: «Generate a key pair», скачайте приватный ключ (на всякий случай);
+   - **Show advanced options → Management → Initialization script → Paste cloud-init script** — вставьте весь `deploy/oracle-cloud-init.sh`, заменив `ЗАМЕНИТЕ_НА_СВОЙ_ПАРОЛЬ` на пароль админки (латиница и цифры);
+   - Create. Если пишет «Out of capacity» — повторите позже или выберите другой Availability Domain.
+4. Откройте порты: страница сервера → Subnet → Default Security List → **Add Ingress Rules**: Source CIDR `0.0.0.0/0`, IP Protocol TCP, Destination port range `80,443`.
+5. Через 10–15 минут сайт откроется по адресу `https://<IP-через-дефисы>.sslip.io` (например, IP 1.2.3.4 → `https://1-2-3-4.sslip.io`). Админка — `/admin`.
+6. В админке: подключите Telegram-бота, впишите свой домен (после A‑записей на IP сервера) — HTTPS для него выпустится сам.
 
-Обновление после изменений в коде: `git pull && docker compose up -d --build`.
-Логи: `docker compose logs -f worker` / `docker compose logs -f web`.
+Обновления: достаточно запушить в `main` — сервер подхватит их в течение 10 минут.
+Логи установки (если всё же зайти по SSH): `/var/log/picarboo-install.log`, обновлений — `/var/log/picarboo-update.log`.
+
+### Другой сервер (Hetzner, Vultr и т.д.)
+
+Тот же скрипт можно запустить вручную на любом Ubuntu: `sudo bash deploy/oracle-cloud-init.sh` (порты 80/443 должны быть открыты).
 
 ### Telegram-бот (заявки и вход)
+
+Проще всего — в админке (`/admin` → Telegram): вставить токен, нажать Start в боте и «Найти мой chat_id». Либо через переменные окружения:
 
 1. В Telegram откройте @BotFather → `/newbot` → получите токен. Впишите `TELEGRAM_BOT_TOKEN` и имя бота без `@` в `TELEGRAM_BOT_USERNAME`.
 2. Напишите своему боту любое сообщение, затем откройте в браузере `https://api.telegram.org/bot<ТОКЕН>/getUpdates` — число `"chat":{"id": ...}` впишите в `TELEGRAM_ADMIN_CHAT_ID`. Заявки будут приходить вам в личку от бота.

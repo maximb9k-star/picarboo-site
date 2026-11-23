@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { leadSchema, createLead } from '@/lib/leads';
 import { getUser } from '@/lib/session';
+import { siteUrl } from '@/lib/site';
 
 // Простая защита от спама: не больше 5 заявок с одного IP за 10 минут.
 const hits = new Map<string, number[]>();
@@ -16,7 +17,7 @@ export async function POST(req: Request) {
   const parsed = leadSchema.safeParse(body);
   if (!parsed.success) return NextResponse.json({ error: parsed.error.issues[0]?.message ?? 'Проверьте поля' }, { status: 400 });
   const user = await getUser();
-  const site = process.env.SITE_URL || new URL(req.url).origin;
+  const site = await siteUrl();
   const r = await createLead(parsed.data, user?.uid ?? null, site);
   return NextResponse.json({ ok: true, id: r.id });
 }

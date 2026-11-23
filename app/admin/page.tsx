@@ -2,7 +2,9 @@ import type { Metadata } from 'next';
 import { isAdmin } from '@/lib/session';
 import { loadSettings } from '@/lib/settings';
 import { query } from '@/lib/db';
-import { login, logout, saveSettings, setSpecHp } from './actions';
+import { login, logout, saveSettings, setSpecHp, saveTelegram, detectChatId, saveDomains } from './actions';
+import { siteDomains } from '@/lib/site';
+import { getTelegramConfig } from '@/lib/telegram';
 
 export const metadata: Metadata = { title: 'Админка', robots: { index: false } };
 export const dynamic = 'force-dynamic';
@@ -46,6 +48,15 @@ export default async function AdminPage({ searchParams }: { searchParams: SP }) 
       'select * from leads order by id desc limit 30',
     ),
   ]);
+  const tg = await getTelegramConfig();
+  const domains = (await siteDomains()).filter((d) => d !== process.env.DOMAIN?.toLowerCase());
+  const tgMsg: Record<string, string> = {
+    ok: 'Бот подключён — проверьте тестовое сообщение в Telegram.',
+    fail: 'Сохранено, но тестовое сообщение не отправилось: проверьте токен и chat_id (сначала напишите боту /start).',
+    chat: 'chat_id найден и сохранён. Нажмите «Сохранить и проверить».',
+    nochat: 'Не нашёл сообщений боту: откройте бота в Telegram, нажмите Start и повторите.',
+    notoken: 'Сначала сохраните токен бота.',
+  };
   const specCounts = await query<{ status: string; n: number }>('select status, count(*)::int as n from specs group by status');
   const st = stats[0]!;
 
@@ -56,6 +67,39 @@ export default async function AdminPage({ searchParams }: { searchParams: SP }) 
         <form action={logout}><button className="btn-ghost !py-2">Выйти</button></form>
       </div>
       {sp.saved && <div className="rounded-xl bg-lime/30 p-3 text-sm font-semibold">Сохранено. Цены пересчитаются в течение пары минут.</div>}
+
+      {sp.tg && <div className="rounded-xl bg-lime/30 p-3 text-sm font-semibold">{tgMsg[sp.tg] ?? ''}</div>}
+
+      <section className="card p-5">
+        <h2 className="text-lg font-bold">Telegram: заявки и вход</h2>
+        <ol className="mt-2 list-decimal space-y-1 pl-5 text-sm text-ink/65">
+          <li>В Telegram откройте @BotFather → /newbot → скопируйте токен и имя бота.</li>
+          <li>Вставьте ниже и сохраните. Затем откройте своего бота, нажмите Start и нажмите «Найти мой chat_id».</li>
+          <li>Для входа на сайт через Telegram: @BotFather → /setdomain → домен сайта.</li>
+        </ol>
+        <form action={saveTelegram} className="mt-4 grid gap-3 sm:grid-cols-3">
+          <label className="block"><span className="label !normal-case !tracking-normal">Токен бота {tg.token ? '(сохранён)' : ''}</span>
+            <input name="token" type="password" className="input" placeholder={tg.token ? '•••••• (оставьте пустым)' : '123456:ABC…'} autoComplete="off" /></label>
+          <label className="block"><span className="label !normal-case !tracking-normal">Имя бота</span>
+            <input name="username" defaultValue={tg.username} className="input" placeholder="picarboo_bot" /></label>
+          <label className="block"><span className="label !normal-case !tracking-normal">Ваш chat_id</span>
+            <input name="chatId" defaultValue={tg.chatId} className="input" placeholder="123456789" /></label>
+          <button className="btn-dark sm:col-span-3">Сохранить и проверить</button>
+        </form>
+        <form action={detectChatId} className="mt-2"><button className="btn-ghost !py-2">Найти мой chat_id</button></form>
+      </section>
+
+      <section className="card p-5">
+        <h2 className="text-lg font-bold">Домен сайта</h2>
+        <p className="mt-1 text-sm text-ink/65">
+          Сейчас сайт открывается по адресу {process.env.DOMAIN ? <b>https://{process.env.DOMAIN}</b> : 'IP сервера'}. Чтобы подключить свой домен: у регистратора создайте A‑записи
+          для домена и www на IP сервера, впишите домен сюда и сохраните — HTTPS‑сертификат выпустится сам при первом заходе.
+        </p>
+        <form action={saveDomains} className="mt-3 flex flex-wrap gap-2">
+          <input name="domains" defaultValue={domains.join(', ')} className="input !w-auto flex-1" placeholder="picarboo.ru" />
+          <button className="btn-dark">Сохранить</button>
+        </form>
+      </section>
 
       <div className="grid gap-4 sm:grid-cols-4">
         <Stat label="Авто в базе" value={st.total} />

@@ -29,22 +29,25 @@ export async function syncNames(): Promise<{ names: number }> {
   const top = await fetchFacets(BASE_QUERY);
   const makers = findFacets(top.iNav?.Nodes ?? [], 'Manufacturer');
   let n = 0;
-  for (const m of makers) {
-    const en = m.Metadata?.EngName?.[0];
-    if (en) { await saveName(m.Value, en, 'manufacturer'); n++; }
-    if (!m.Count) continue;
-    const q = `(And.Hidden.N._.SellType.일반._.(C.CarType.A._.Manufacturer.${escapeValue(m.Value)}.))`;
-    try {
-      const r = await fetchFacets(q);
-      for (const g of findFacets(r.iNav?.Nodes ?? [], 'ModelGroup')) {
-        const gen = g.Metadata?.EngName?.[0];
-        if (gen) { await saveName(g.Value, prettifyEn(gen), 'model_group'); n++; }
+  const queue = [...makers];
+  async function worker(): Promise<void> {
+    for (let m = queue.shift(); m; m = queue.shift()) {
+      const en = m.Metadata?.EngName?.[0];
+      if (en) { await saveName(m.Value, en, 'manufacturer'); n++; }
+      if (!m.Count) continue;
+      const q = `(And.Hidden.N._.SellType.일반._.(C.CarType.A._.Manufacturer.${escapeValue(m.Value)}.))`;
+      try {
+        const r = await fetchFacets(q);
+        for (const g of findFacets(r.iNav?.Nodes ?? [], 'ModelGroup')) {
+          const gen = g.Metadata?.EngName?.[0];
+          if (gen) { await saveName(g.Value, prettifyEn(gen), 'model_group'); n++; }
+        }
+      } catch (e) {
+        console.error('names', m.Value, String(e));
       }
-    } catch (e) {
-      console.error('names', m.Value, e);
     }
-    await sleep(400);
   }
+  await Promise.all(Array.from({ length: 5 }, worker));
   return { names: n };
 }
 
@@ -164,19 +167,35 @@ export function splitSlice(s: Slice): Slice[] | null {
   return null;
 }
 
-export async function syncFull(concurrency = 4): Promise<{ seen: number; total: number; requests: number; deactivated: number }> {
-  const names = await loadNames();
-  const started = new Date();
-  const total = (await fetchList(BASE_QUERY, 0, 1)).Count;
-  const ids = new Set<number>();
-  const queue: Slice[] = [{ p: [0, 999_999], m: [0, 9_999_999] }];
-  let requests = 0;
-  let failed = 0;
-  let active = 0;
+interface FullScanState { queue: Slice[]; started: string; total: number; seen: number; failed: number; requests: number }
 
+export async function getState<T>(key: string): Promise<T | null> {
+  const [r] = await query<{ value: T }>('select value from sync_state where key = $1', [key]);
+  return r?.value ?? null;
+}
+
+export async function setState(key: string, value: unknown): Promise<void> {
+  await query(
+    `insert into sync_state (key, value, updated_at) values ($1, $2::jsonb, now())
+     on conflict (key) do update set value = excluded.value, updated_at = now()`,
+    [key, JSON.stringify(value)],
+  );
+}
+
+// Один шаг полного прохода (до deadline). Состояние хранится в базе, следующий запуск продолжает с того же места.
+// Возвращает done=true, когда проход закончен.
+export async function syncFullStep(deadline: number, concurrency = 4): Promise<{ done: boolean; seen: number; total: number; queue: number; deactivated?: number }> {
+  let st = await getState<FullScanState>('full_scan');
+  if (!st) {
+    const total = (await fetchList(BASE_QUERY, 0, 1)).Count;
+    st = { queue: [{ p: [0, 999_999], m: [0, 9_999_999] }], started: new Date().toISOString(), total, seen: 0, failed: 0, requests: 0 };
+  }
+  const names = await loadNames();
+  const state = st;
+  let active = 0;
   async function worker(): Promise<void> {
-    for (;;) {
-      const s = queue.shift();
+    while (Date.now() < deadline) {
+      const s = state.queue.shift();
       if (!s) {
         if (active === 0) return;
         await sleep(100);
@@ -185,34 +204,40 @@ export async function syncFull(concurrency = 4): Promise<{ seen: number; total: 
       active++;
       try {
         const r = await fetchList(sliceQuery(s), 0, SLICE_LIMIT);
-        requests++;
+        state.requests++;
         const parts = r.Count > r.SearchResults.length ? splitSlice(s) : null;
         if (parts) {
-          queue.push(...parts);
+          state.queue.push(...parts);
         } else {
-          for (const it of r.SearchResults) ids.add(Number(it.Id));
+          state.seen += r.SearchResults.length;
           const rows = r.SearchResults.map((it) => mapListItem(it, names)).filter((x): x is CarListRow => x != null);
           await upsertList([...new Map(rows.map((x) => [x.id, x])).values()]);
         }
       } catch (e) {
-        failed++;
+        state.queue.push(s); // повторим в следующий раз
+        state.failed++;
         console.error('slice', JSON.stringify(s), String(e));
+        if (state.failed > 50) break;
       } finally {
         active--;
       }
-      if (requests % 200 === 0) console.log(`list_full: ${ids.size} / ${total}, запросов ${requests}`);
-      await sleep(150);
     }
   }
   await Promise.all(Array.from({ length: concurrency }, worker));
 
-  // Снятые с продажи скрываем только если обошли почти весь каталог без ошибок.
+  if (state.queue.length > 0 && state.failed <= 50) {
+    await setState('full_scan', state);
+    return { done: false, seen: state.seen, total: state.total, queue: state.queue.length };
+  }
+  // Снятые с продажи скрываем, только если обошли почти весь каталог.
   let deactivated = 0;
-  if (failed === 0 && ids.size >= total * 0.97) {
-    const res = await getPool().query('update cars set active = false where active and last_seen_at < $1', [started]);
+  if (state.queue.length === 0 && state.seen >= state.total * 0.97) {
+    const res = await getPool().query('update cars set active = false where active and last_seen_at < $1', [state.started]);
     deactivated = res.rowCount ?? 0;
   }
-  return { seen: ids.size, total, requests, deactivated };
+  await query("delete from sync_state where key = 'full_scan'");
+  await setState('full_scan_last', { finished: new Date().toISOString(), seen: state.seen, total: state.total, deactivated, requests: state.requests });
+  return { done: true, seen: state.seen, total: state.total, queue: 0, deactivated };
 }
 
 // Новые и изменённые объявления: первые страницы по дате изменения, пока не пойдут уже известные.
@@ -247,17 +272,16 @@ export async function syncList(): Promise<{ seen: number; total: number }> {
 
 // ---------- Детали ----------
 
-export async function syncDetails(limit = 200, concurrency = 3): Promise<{ done: number; gone: number }> {
+export async function syncDetails(deadline: number, concurrency = 4): Promise<{ done: number; gone: number }> {
   const names = await loadNames();
   const cars = await query<{ id: number }>(
-    'select id from cars where active and detail_fetched_at is null order by first_seen_at desc, id desc limit $1',
-    [limit],
+    'select id from cars where active and detail_fetched_at is null order by first_seen_at desc, id desc limit 400',
   );
   let done = 0;
   let gone = 0;
   const queue = [...cars];
   async function worker(): Promise<void> {
-    for (let c = queue.shift(); c; c = queue.shift()) {
+    for (let c = queue.shift(); c && Date.now() < deadline; c = queue.shift()) {
       try {
         await fetchAndSaveDetail(c.id, names);
         done++;
@@ -267,16 +291,16 @@ export async function syncDetails(limit = 200, concurrency = 3): Promise<{ done:
           gone++;
         } else {
           console.error('detail', c.id, String(e));
-          await sleep(3000);
+          await sleep(1000);
         }
       }
-      await sleep(250);
     }
   }
   await Promise.all(Array.from({ length: concurrency }, worker));
   return { done, gone };
 }
 
+// Из деталей сохраняем только то, что нужно для фильтров и расчёта; остальное страница авто берёт с Encar вживую.
 export async function fetchAndSaveDetail(id: number, names?: Record<string, string>): Promise<void> {
   const v = await fetchVehicle(id);
   const [rec, ins] = await Promise.all([
@@ -289,20 +313,15 @@ export async function fetchAndSaveDetail(id: number, names?: Record<string, stri
   );
   if (!car) return;
   const key = specKey({ ...car, model_group_ko: d.model_group_ko, displacement: d.displacement });
-  await query(
-    `insert into specs (key) values ($1) on conflict (key) do nothing`, [key],
-  );
+  await query('insert into specs (key) values ($1) on conflict (key) do nothing', [key]);
   await query(
     `update cars set vehicle_id = $2, model_group_ko = $3, model_group = $4, displacement = $5, color = $6, body = $7,
-       seats = $8, vin = $9, vehicle_no = $10, options = $11, awd = awd or $12, accident_cnt = $13, insurance_krw = $14,
-       owner_changes = $15, damaged_parts = $16, detail = $17, detail_fetched_at = now(), spec_key = $18, price_calc_at = null,
-       photos = case when jsonb_array_length($19::jsonb) > 0 then $19::jsonb else photos end,
-       transmission = coalesce($20, transmission),
-       modified_at = coalesce($21::timestamptz, modified_at)
+       seats = $8, awd = awd or $9, accident_cnt = $10, insurance_krw = $11, owner_changes = $12, damaged_parts = $13,
+       detail_fetched_at = now(), spec_key = $14, price_calc_at = null,
+       transmission = coalesce($15, transmission), modified_at = coalesce($16::timestamptz, modified_at)
      where id = $1`,
-    [id, d.vehicle_id, d.model_group_ko, d.model_group, d.displacement, d.color, d.body, d.seats, d.vin, d.vehicle_no,
-      JSON.stringify(d.options), d.awd, d.accident_cnt, d.insurance_krw, d.owner_changes, d.damaged_parts, JSON.stringify(d.detail), key,
-      JSON.stringify(d.photos), d.transmission, d.listed_at],
+    [id, d.vehicle_id, d.model_group_ko, d.model_group, d.displacement, d.color, d.body, d.seats, d.awd, d.accident_cnt,
+      d.insurance_krw, d.owner_changes, d.damaged_parts, key, d.transmission, d.listed_at],
   );
 }
 
@@ -321,15 +340,15 @@ export function specKey(c: { manufacturer_ko: string; model_ko: string; model_gr
 
 // ---------- Мощность (Naver) ----------
 
-export async function syncSpecs(limit = 30): Promise<{ resolved: number; failed: number }> {
+export async function syncSpecs(deadline: number): Promise<{ resolved: number; failed: number }> {
   const specs = await query<{ key: string }>(
-    `select s.key from specs s where s.status = 'pending'
-     order by (select count(*) from cars c where c.spec_key = s.key and c.active) desc limit $1`,
-    [limit],
+    `select s.key from specs s join cars c on c.spec_key = s.key and c.active
+     where s.status = 'pending' group by s.key order by count(*) desc limit 30`,
   );
   let resolved = 0;
   let failed = 0;
   for (const s of specs) {
+    if (Date.now() > deadline - 8000) break; // один поиск на Naver — до нескольких запросов
     const [makerKo, groupKo, modelKo, formYear, fuel, cc, turbo, variant] = s.key.split('|');
     try {
       const r = await resolveHp({
@@ -353,34 +372,35 @@ export async function syncSpecs(limit = 30): Promise<{ resolved: number; failed:
       if (r) resolved++; else failed++;
     } catch (e) {
       console.error('spec', s.key, String(e));
-      await sleep(10000);
+      break;
     }
-    await sleep(1500);
+    await sleep(500);
   }
   return { resolved, failed };
 }
 
 // ---------- Цены ----------
 
-export async function repriceAll(onlyStale: boolean): Promise<{ priced: number }> {
+export async function repriceAll(onlyStale: boolean, deadline = Infinity): Promise<{ priced: number }> {
   const rates = await loadRates();
   const settings = await loadSettings();
   const now = new Date();
   let priced = 0;
   let lastId = 0;
-  for (;;) {
+  while (Date.now() < deadline) {
     const rows = await query<{ id: number; price_krw: number; year_month: number; displacement: number | null; fuel: Fuel; hp: number | null }>(
       `select c.id, c.price_krw, c.year_month, c.displacement, c.fuel, coalesce(c.hp_manual, s.hp) as hp
        from cars c left join specs s on s.key = c.spec_key
        where c.active and c.detail_fetched_at is not null and c.id > $1 ${onlyStale ? 'and c.price_calc_at is null' : ''}
-       order by c.id limit 2000`,
+       order by c.id limit 3000`,
       [lastId],
     );
     if (!rows.length) break;
     lastId = rows[rows.length - 1]!.id;
     const ids: number[] = [];
     const prices: (number | null)[] = [];
-    const calcs: string[] = [];
+    const groups: (string | null)[] = [];
+    const months: (number | null)[] = [];
     for (const r of rows) {
       const p = calcPrice(
         { priceKrw: r.price_krw, yearMonth: r.year_month, displacementCc: r.displacement, hp: r.hp, fuel: r.fuel, now },
@@ -390,12 +410,13 @@ export async function repriceAll(onlyStale: boolean): Promise<{ priced: number }
       ids.push(r.id);
       // Без мощности утильсбор неизвестен — итог не показываем, чтобы не занизить цену.
       prices.push(p && !p.customs.needsHp ? p.totalRub : null);
-      calcs.push(JSON.stringify(p));
+      groups.push(p?.ageGroup ?? null);
+      months.push(p?.monthsToNextGroup ?? null);
     }
     await query(
-      `update cars c set price_rub = v.price, price_calc = v.calc::jsonb, price_calc_at = now()
-       from unnest($1::bigint[], $2::bigint[], $3::text[]) as v(id, price, calc) where c.id = v.id`,
-      [ids, prices, calcs],
+      `update cars c set price_rub = v.price, age_group = v.g, months_to_next = v.m, price_calc_at = now()
+       from unnest($1::bigint[], $2::bigint[], $3::text[], $4::int[]) as v(id, price, g, m) where c.id = v.id`,
+      [ids, prices, groups, months],
     );
     priced += rows.length;
   }

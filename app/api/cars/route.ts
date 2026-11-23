@@ -9,8 +9,7 @@ export async function GET(req: Request) {
   if (!ids.length) return NextResponse.json({ cars: [] });
   const cars = await query<CarCard>(
     `select c.id, c.manufacturer, c.model, c.badge, c.fuel, c.year_month, c.mileage, c.displacement, null::int as hp, c.awd,
-       c.price_krw, c.price_rub, c.photo_path, c.price_calc->>'ageGroup' as age_group,
-       (c.price_calc->>'monthsToNextGroup')::int as months_to_next, c.accident_cnt, c.first_seen_at
+       c.price_krw, c.price_rub, c.photo_path, c.age_group, c.months_to_next, c.accident_cnt, c.first_seen_at
      from cars c where c.id = any($1::bigint[])`,
     [ids],
   );

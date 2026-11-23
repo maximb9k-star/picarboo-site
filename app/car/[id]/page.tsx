@@ -6,7 +6,7 @@ import { photoUrl } from '@/lib/encar/client';
 import { FUEL_LABEL } from '@/lib/encar/translate';
 import { groupOptions } from '@/lib/encar/options';
 import { carTitle, km, krw, rub, yearMonth, plural } from '@/lib/format';
-import { getUser, loginConfigured } from '@/lib/session';
+import { getUser, loginBot } from '@/lib/session';
 import { contacts } from '@/lib/contacts';
 import { Gallery } from '@/components/Gallery';
 import { PriceBox } from '@/components/PriceBox';
@@ -15,6 +15,8 @@ import { LeadForm } from '@/components/LeadForm';
 import { FavoriteButton } from '@/components/FavoriteButton';
 import { TelegramLogin } from '@/components/TelegramLogin';
 import { RateBadge } from '@/components/CarCard';
+import { liveDetail, livePrice } from '@/lib/live';
+import { siteUrl } from '@/lib/site';
 
 export const dynamic = 'force-dynamic';
 
@@ -42,16 +44,22 @@ export default async function CarPage({ params }: Props) {
   const car = await load(id);
   if (!car) notFound();
   const user = await getUser();
-  const canLogin = loginConfigured();
+  const bot = await loginBot();
+  const canLogin = !!bot;
   const unlocked = !!user || !canLogin; // пока вход не настроен — показываем всё
   const c = contacts();
   const title = carTitle(car);
-  const photos = car.photos.map((p) => photoUrl(p, 1024, 680));
-  const rec = car.detail?.record ?? null;
-  const ins = car.detail?.inspection ?? null;
-  const options = groupOptions(car.options ?? []);
+  const [{ detail: live, gone }, priceCalc] = await Promise.all([liveDetail(car.id), livePrice(car)]);
+  const photoPaths = live?.photos.length ? live.photos : car.photo_path ? [car.photo_path] : [];
+  const photos = photoPaths.map((p) => photoUrl(p, 1024, 680));
+  const rec = live?.detail.record ?? null;
+  const ins = live?.detail.inspection ?? null;
+  const options = groupOptions(live?.options ?? []);
+  const vin = live?.vin ?? car.vin;
+  const vehicleNo = live?.vehicle_no ?? car.vehicle_no;
+  const active = car.active && !gone;
   const hpPending = car.spec_status === 'pending' && !car.hp;
-  const tgText = encodeURIComponent(`Здравствуйте! Интересует ${title} (${car.price_rub ? rub(car.price_rub) : krw(car.price_krw)}): ${process.env.SITE_URL || 'https://picarboo.ru'}/car/${car.id}`);
+  const tgText = encodeURIComponent(`Здравствуйте! Интересует ${title} (${car.price_rub ? rub(car.price_rub) : krw(car.price_krw)}): ${await siteUrl()}/car/${car.id}`);
   const locked = (v: React.ReactNode) => (unlocked ? v : <span className="text-ink/40">войдите, чтобы увидеть</span>);
 
   return (
@@ -68,7 +76,7 @@ export default async function CarPage({ params }: Props) {
         )}
       </nav>
 
-      {!car.active && (
+      {!active && (
         <div className="mb-4 rounded-xl bg-amber-100 p-3 text-sm font-semibold text-amber-900">Объявление снято с продажи на Encar. Подберём похожий автомобиль — напишите нам.</div>
       )}
 
@@ -96,20 +104,22 @@ export default async function CarPage({ params }: Props) {
               <Item k="Цвет" v={car.color ?? '—'} />
               <Item k="Кузов" v={car.body ?? '—'} />
               {car.seats ? <Item k="Мест" v={car.seats} /> : null}
-              <Item k="VIN" v={locked(car.vin ? <span className="font-mono">{car.vin}</span> : '—')} />
-              <Item k="Гос. номер" v={locked(car.vehicle_no ?? '—')} />
+              <Item k="VIN" v={locked(vin ? <span className="font-mono">{vin}</span> : '—')} />
+              <Item k="Гос. номер" v={locked(vehicleNo ?? '—')} />
               {car.city ? <Item k="Где стоит" v={`Корея, ${car.city}`} /> : null}
             </dl>
             {!unlocked && canLogin && (
               <div className="mt-4 flex flex-wrap items-center gap-3 rounded-xl bg-paper p-3">
                 <span className="text-sm text-ink/70">VIN, гос. номер и мощность — после входа через Telegram</span>
-                <TelegramLogin bot={process.env.TELEGRAM_BOT_USERNAME!} next={`/car/${car.id}`} />
+                <TelegramLogin bot={bot!} next={`/car/${car.id}`} />
               </div>
             )}
           </Section>
 
           <Section title="Страховая история">
-            {rec ? (
+            {!live ? (
+              <p className="text-sm text-ink/60">Не удалось загрузить историю с Encar — обновите страницу через минуту.</p>
+            ) : rec ? (
               <div className="space-y-3 text-sm">
                 <div className="grid gap-3 sm:grid-cols-3">
                   <Stat label="Страховые случаи" value={rec.myAccidentCnt + rec.otherAccidentCnt === 0 ? 'нет' : String(rec.myAccidentCnt + rec.otherAccidentCnt)} good={rec.myAccidentCnt + rec.otherAccidentCnt === 0} />
@@ -186,7 +196,7 @@ export default async function CarPage({ params }: Props) {
         </div>
 
         <aside className="space-y-4 lg:sticky lg:top-20 lg:self-start">
-          <PriceBox calc={car.price_calc} priceKrw={car.price_krw} hpPending={hpPending} />
+          <PriceBox calc={priceCalc} priceKrw={car.price_krw} hpPending={hpPending} />
           <div className="card space-y-2 p-5">
             <a href={`${c.telegramUrl}?text=${tgText}`} target="_blank" rel="noopener" className="btn-dark w-full">Написать в Telegram</a>
             <a href={`${c.whatsappUrl}?text=${tgText}`} target="_blank" rel="noopener" className="btn-ghost w-full">WhatsApp</a>

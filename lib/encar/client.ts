@@ -4,13 +4,15 @@ const API = 'https://api.encar.com';
 
 export const PHOTO_HOST = 'https://ci.encar.com';
 
-async function getJson<T>(url: string, attempts = 3): Promise<T> {
+// cacheSec > 0 — ответ кэшируется (на Vercel — в кэше данных Next.js), для страниц авто.
+async function getJson<T>(url: string, attempts = 3, cacheSec = 0): Promise<T> {
   let lastErr: unknown;
   for (let i = 0; i < attempts; i++) {
     try {
       const res = await fetch(url, {
         headers: { 'User-Agent': UA, Referer: 'https://www.encar.com/', Accept: 'application/json' },
-        signal: AbortSignal.timeout(30000),
+        signal: AbortSignal.timeout(cacheSec ? 8000 : 30000),
+        ...(cacheSec ? { next: { revalidate: cacheSec } } : { cache: 'no-store' as const }),
       });
       if (res.status === 404) throw new NotFoundError(url);
       if (!res.ok) throw new Error(`Encar ${res.status} ${url}`);
@@ -88,8 +90,8 @@ export interface EncarVehicle {
   contents?: { text?: string };
 }
 
-export async function fetchVehicle(listingId: string | number): Promise<EncarVehicle> {
-  return getJson<EncarVehicle>(`${API}/v1/readside/vehicle/${listingId}`);
+export async function fetchVehicle(listingId: string | number, cacheSec = 0): Promise<EncarVehicle> {
+  return getJson<EncarVehicle>(`${API}/v1/readside/vehicle/${listingId}`, cacheSec ? 1 : 3, cacheSec);
 }
 
 export interface EncarRecord {
@@ -99,9 +101,9 @@ export interface EncarRecord {
   accidents?: { type: string; date: string; insuranceBenefit: number; partCost: number; laborCost: number; paintingCost: number }[];
 }
 
-export async function fetchRecord(vehicleId: number, vehicleNo: string): Promise<EncarRecord | null> {
+export async function fetchRecord(vehicleId: number, vehicleNo: string, cacheSec = 0): Promise<EncarRecord | null> {
   try {
-    return await getJson<EncarRecord>(`${API}/v1/readside/record/vehicle/${vehicleId}/open?vehicleNo=${encodeURIComponent(vehicleNo)}`, 2);
+    return await getJson<EncarRecord>(`${API}/v1/readside/record/vehicle/${vehicleId}/open?vehicleNo=${encodeURIComponent(vehicleNo)}`, cacheSec ? 1 : 2, cacheSec);
   } catch {
     return null;
   }
@@ -120,9 +122,9 @@ export interface EncarInspection {
   outers?: InspectionItem[];
 }
 
-export async function fetchInspection(vehicleId: number): Promise<EncarInspection | null> {
+export async function fetchInspection(vehicleId: number, cacheSec = 0): Promise<EncarInspection | null> {
   try {
-    return await getJson<EncarInspection>(`${API}/v1/readside/inspection/vehicle/${vehicleId}`, 2);
+    return await getJson<EncarInspection>(`${API}/v1/readside/inspection/vehicle/${vehicleId}`, cacheSec ? 1 : 2, cacheSec);
   } catch {
     return null;
   }
