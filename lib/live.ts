@@ -5,6 +5,7 @@ import { loadRates } from './rates';
 import { loadSettings } from './settings';
 import { calcPrice, type PriceBreakdown } from './pricing/price';
 import type { CarFull } from './catalog';
+import { memo } from './memo';
 
 export async function liveDetail(id: number): Promise<{ detail: CarDetailRow | null; gone: boolean }> {
   try {
@@ -21,7 +22,7 @@ export async function liveDetail(id: number): Promise<{ detail: CarDetailRow | n
 
 export async function livePrice(car: CarFull): Promise<PriceBreakdown | null> {
   try {
-    const [rates, settings] = await Promise.all([loadRates(), loadSettings()]);
+    const [rates, settings] = await Promise.all([memo('rates', loadRates), memo('settings', loadSettings)]);
     return calcPrice({ priceKrw: car.price_krw, yearMonth: car.year_month, displacementCc: car.displacement, hp: car.hp, fuel: car.fuel }, rates, settings);
   } catch {
     return null;

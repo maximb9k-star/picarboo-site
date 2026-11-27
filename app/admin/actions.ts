@@ -6,6 +6,7 @@ import { revalidatePath } from 'next/cache';
 import { sign, isAdmin, COOKIE_NAMES } from '@/lib/session';
 import { saveSetting } from '@/lib/settings';
 import { query } from '@/lib/db';
+import { clearMemo } from '@/lib/memo';
 
 function intOrNull(v: FormDataEntryValue | null): number | null {
   const s = String(v ?? '').replace(/[\s₩₽,]/g, '');
@@ -49,6 +50,7 @@ export async function saveSettings(form: FormData): Promise<void> {
   await saveSetting('rubKrwOverride', Number.isFinite(manualRate) && manualRate > 0 ? manualRate : null);
   // Пересчитать все цены при следующем проходе фонового процесса
   await query('update cars set price_calc_at = null where active');
+  clearMemo();
   revalidatePath('/admin');
   redirect('/admin?saved=1');
 }
@@ -64,6 +66,7 @@ export async function setSpecHp(form: FormData): Promise<void> {
     await query(`update specs set status = 'pending' where key = $1`, [key]);
   }
   await query('update cars set price_calc_at = null where spec_key = $1', [key]);
+  clearMemo();
   revalidatePath('/admin');
 }
 

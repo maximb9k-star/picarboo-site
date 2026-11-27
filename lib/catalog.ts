@@ -1,5 +1,6 @@
 // Запросы каталога: фильтры, сортировка, карточка авто.
 import { query } from './db';
+import { memo } from './memo';
 import type { Fuel } from './encar/translate';
 
 export const PAGE_SIZE = 24;
@@ -114,7 +115,7 @@ export function buildWhere(f: CatalogFilters): { sql: string; params: unknown[] 
 const CARD_COLUMNS = `c.id, c.manufacturer, c.model, c.badge, c.fuel, c.year_month, c.mileage, c.displacement, ${HP_EXPR} as hp, c.awd,
   c.price_krw, c.price_rub, c.photo_path, c.age_group, c.months_to_next, c.accident_cnt, c.first_seen_at`;
 
-export async function searchCars(f: CatalogFilters, sort: SortKey, page: number): Promise<{ cars: CarCard[]; total: number }> {
+async function searchCarsDb(f: CatalogFilters, sort: SortKey, page: number): Promise<{ cars: CarCard[]; total: number }> {
   const { sql, params } = buildWhere(f);
   const offset = (Math.max(1, page) - 1) * PAGE_SIZE;
   const [cars, count] = await Promise.all([
@@ -130,14 +131,14 @@ export async function searchCars(f: CatalogFilters, sort: SortKey, page: number)
 
 export interface FacetOption { value: string; count: number }
 
-export async function facetManufacturers(): Promise<FacetOption[]> {
+async function facetManufacturersDb(): Promise<FacetOption[]> {
   return query<FacetOption>(
     `select manufacturer as value, count(*)::int as count from cars where active and detail_fetched_at is not null
      group by 1 order by count(*) desc`,
   );
 }
 
-export async function facetModelGroups(manufacturer: string): Promise<FacetOption[]> {
+async function facetModelGroupsDb(manufacturer: string): Promise<FacetOption[]> {
   return query<FacetOption>(
     `select model_group as value, count(*)::int as count from cars
      where active and detail_fetched_at is not null and manufacturer = $1 and model_group is not null group by 1 order by 1`,
@@ -145,7 +146,7 @@ export async function facetModelGroups(manufacturer: string): Promise<FacetOptio
   );
 }
 
-export async function facetModels(manufacturer: string, modelGroup: string): Promise<FacetOption[]> {
+async function facetModelsDb(manufacturer: string, modelGroup: string): Promise<FacetOption[]> {
   return query<FacetOption>(
     `select model as value, count(*)::int as count from cars
      where active and detail_fetched_at is not null and manufacturer = $1 and model_group = $2 group by 1 order by count(*) desc`,
@@ -153,7 +154,7 @@ export async function facetModels(manufacturer: string, modelGroup: string): Pro
   );
 }
 
-export async function facetSimple(column: 'color' | 'body'): Promise<FacetOption[]> {
+async function facetSimpleDb(column: 'color' | 'body'): Promise<FacetOption[]> {
   return query<FacetOption>(
     `select ${column} as value, count(*)::int as count from cars where active and detail_fetched_at is not null and ${column} is not null
      group by 1 order by count(*) desc`,
@@ -180,7 +181,7 @@ export interface CarFull extends CarCard {
   active: boolean;
 }
 
-export async function getCar(id: number): Promise<CarFull | null> {
+async function getCarDb(id: number): Promise<CarFull | null> {
   const rows = await query<CarFull>(
     `select ${CARD_COLUMNS}, c.model_group, c.transmission, c.form_year, c.color, c.body, c.seats, c.vin, c.vehicle_no, c.vehicle_id, c.photos,
        c.insurance_krw, c.damaged_parts, c.owner_changes, s.status as spec_status, c.city, c.modified_at, c.active
@@ -190,7 +191,7 @@ export async function getCar(id: number): Promise<CarFull | null> {
   return rows[0] ?? null;
 }
 
-export async function catalogStats(): Promise<{ total: number; today: number }> {
+async function catalogStatsDb(): Promise<{ total: number; today: number }> {
   const [r] = await query<{ total: number; today: number }>(
     `select count(*)::int as total, count(*) filter (where first_seen_at > now() - interval '24 hours')::int as today
      from cars where active and detail_fetched_at is not null`,
@@ -198,10 +199,23 @@ export async function catalogStats(): Promise<{ total: number; today: number }> 
   return r ?? { total: 0, today: 0 };
 }
 
-export async function latestCars(limit = 8): Promise<CarCard[]> {
+async function latestCarsDb(limit = 8): Promise<CarCard[]> {
   return query<CarCard>(
     `select ${CARD_COLUMNS} from cars c left join specs s on s.key = c.spec_key
      where c.active and c.price_rub is not null order by coalesce(c.modified_at, c.first_seen_at) desc limit $1`,
     [limit],
   );
 }
+
+// Публичные функции — с кэшем на 1 минуту (см. lib/memo.ts).
+export const searchCars = (f: CatalogFilters, sort: SortKey, page: number) =>
+  memo(`search:${JSON.stringify([f, sort, page])}`, () => searchCarsDb(f, sort, page));
+export const facetManufacturers = () => memo('facet:manufacturer', facetManufacturersDb);
+export const facetModelGroups = (manufacturer: string) =>
+  memo(`facet:group:${manufacturer}`, () => facetModelGroupsDb(manufacturer));
+export const facetModels = (manufacturer: string, modelGroup: string) =>
+  memo(`facet:model:${manufacturer}\u0000${modelGroup}`, () => facetModelsDb(manufacturer, modelGroup));
+export const facetSimple = (column: 'color' | 'body') => memo(`facet:${column}`, () => facetSimpleDb(column));
+export const getCar = (id: number) => memo(`car:${id}`, () => getCarDb(id));
+export const catalogStats = () => memo('stats', catalogStatsDb);
+export const latestCars = (limit = 8) => memo(`latest:${limit}`, () => latestCarsDb(limit));

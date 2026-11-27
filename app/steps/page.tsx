@@ -4,13 +4,14 @@ import { loadSettings } from '@/lib/settings';
 import { loadRates } from '@/lib/rates';
 import { krw, rub } from '@/lib/format';
 import { contacts } from '@/lib/contacts';
+import { memo } from '@/lib/memo';
 
 export const metadata: Metadata = { title: 'Этапы покупки авто из Кореи', description: 'Как проходит покупка: выбор, осмотр, залог, выкуп, доставка во Владивосток и растаможка.' };
 export const dynamic = 'force-dynamic';
 
 export default async function StepsPage() {
-  const s = await loadSettings();
-  const rates = await loadRates().catch(() => null);
+  const s = await memo('settings', loadSettings);
+  const rates = await memo('rates', loadRates).catch(() => null);
   const inRub = (v: number) => (rates ? ` (≈ ${rub(v / rates.rubKrwRemit)})` : '');
   const deposit = s.depositKrw ? `${krw(s.depositKrw)}${inRub(s.depositKrw)}` : null;
   const c = contacts();
