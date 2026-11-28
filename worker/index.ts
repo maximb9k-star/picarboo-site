@@ -3,9 +3,11 @@
 import { closePool } from '../lib/db';
 import { migrate } from '../scripts/migrate';
 import { tick } from '../lib/jobs';
+import { applyMildHybridRules } from './sync';
 
 async function main(): Promise<void> {
   await migrate();
+  console.log('mild hybrids:', JSON.stringify(await applyMildHybridRules()));
   const once = process.argv.includes('--once');
   for (;;) {
     const r = await tick(once ? 120_000 : 55_000);

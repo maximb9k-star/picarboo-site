@@ -14,7 +14,7 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
   const parts = [p.brand, p.model].filter(Boolean).join(' ');
   return {
     title: parts ? `${parts} из Кореи — цены под ключ` : 'Каталог авто из Кореи',
-    description: 'Автомобили с Encar с полной ценой под ключ до Владивостока: растаможка, утильсбор, доставка.',
+    description: 'Автомобили из Кореи с полной ценой под ключ до Владивостока: растаможка, утильсбор, доставка.',
   };
 }
 
@@ -37,7 +37,7 @@ export default async function CatalogPage({ searchParams }: { searchParams: Prom
         <div>
           <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl">Авто из Кореи</h1>
           <p className="mt-1 text-sm text-ink/60">
-            {total.toLocaleString('ru-RU')} {plural(total, 'автомобиль', 'автомобиля', 'автомобилей')} с Encar · цена под ключ до Владивостока
+            {total.toLocaleString('ru-RU')} {plural(total, 'автомобиль', 'автомобиля', 'автомобилей')} из Кореи · цена под ключ до Владивостока
           </p>
         </div>
         <SortSelect value={sort} options={SORTS} />

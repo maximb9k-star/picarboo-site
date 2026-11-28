@@ -1,10 +1,13 @@
-// Курсы: оплата авто — Naver «송금 받을 때» (₩ за 1 ₽, банк Hana); таможня — курс ЦБ РФ.
+// Курсы: стоимость авто и расходы по Корее — курс, заданный в админке (₩ за 1 ₽);
+// таможня и утильсбор — курс ЦБ РФ. Курс Naver «송금 받을 때» загружается только для справки
+// и используется, лишь пока курс в админке не задан.
 import { query } from './db';
 
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124 Safari/537.36';
 
 export interface Rates {
-  rubKrwRemit: number; // ₩ за 1 ₽ (по нему клиент платит за авто)
+  rubKrwRemit: number; // ₩ за 1 ₽ — курс для авто и расходов по Корее (из админки)
+  rubKrwSource: 'admin' | 'naver'; // naver — временно, пока курс в админке не задан
   eurRub: number;      // ЦБ: ₽ за 1 €
   usdRub: number;      // ЦБ: ₽ за 1 $
   krwRub: number;      // ЦБ: ₽ за 1 ₩ (для таможенной стоимости)
@@ -73,8 +76,10 @@ export async function loadRates(): Promise<Rates> {
     return Number(r.value);
   };
   const manual = override[0]?.value;
+  const fromAdmin = typeof manual === 'number' && manual > 0;
   return {
-    rubKrwRemit: typeof manual === 'number' && manual > 0 ? manual : need('RUB_KRW_REMIT'),
+    rubKrwRemit: fromAdmin ? manual : need('RUB_KRW_REMIT'),
+    rubKrwSource: fromAdmin ? 'admin' : 'naver',
     eurRub: need('EUR_RUB'),
     usdRub: need('USD_RUB'),
     krwRub: need('KRW_RUB'),

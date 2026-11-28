@@ -30,6 +30,12 @@ export interface CustomsResult {
 
 export type AgeGroup = 'lt3' | '3to5' | '5to7' | 'gt7';
 
+// 30-минутная мощность электромотора, когда она не подтверждена: таможня берёт 45% пиковой (с февраля 2026).
+export const EV_30MIN_FACTOR = 0.45;
+export function ev30MinHp(peakHp: number): number {
+  return Math.round(peakHp * EV_30MIN_FACTOR);
+}
+
 export function ageGroup(ageMonths: number): AgeGroup {
   if (ageMonths < 36) return 'lt3';
   if (ageMonths < 60) return '3to5';

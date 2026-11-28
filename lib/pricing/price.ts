@@ -3,7 +3,7 @@ import { calcCustoms, type AgeGroup, type CustomsResult } from './customs';
 import type { Fuel } from '../encar/translate';
 
 export interface PriceRates {
-  rubKrwRemit: number; // ₩ за 1 ₽ (Naver, 송금 받을 때)
+  rubKrwRemit: number; // ₩ за 1 ₽ — курс для авто и расходов по Корее (из админки)
   eurRub: number;      // ЦБ
   krwRub: number;      // ЦБ, ₽ за 1 ₩
 }

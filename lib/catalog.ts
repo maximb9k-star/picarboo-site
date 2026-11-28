@@ -78,7 +78,7 @@ export interface CarCard {
 const HP_EXPR = 'coalesce(c.hp_manual, s.hp)';
 
 export function buildWhere(f: CatalogFilters): { sql: string; params: unknown[] } {
-  const where: string[] = ['c.active', 'c.detail_fetched_at is not null'];
+  const where: string[] = ['c.active', 'c.detail_fetched_at is not null', 'not c.is_dup'];
   const params: unknown[] = [];
   const p = (v: unknown) => { params.push(v); return `$${params.length}`; };
   if (f.manufacturer) where.push(`c.manufacturer = ${p(f.manufacturer)}`);
@@ -133,7 +133,7 @@ export interface FacetOption { value: string; count: number }
 
 async function facetManufacturersDb(): Promise<FacetOption[]> {
   return query<FacetOption>(
-    `select manufacturer as value, count(*)::int as count from cars where active and detail_fetched_at is not null
+    `select manufacturer as value, count(*)::int as count from cars where active and detail_fetched_at is not null and not is_dup
      group by 1 order by count(*) desc`,
   );
 }
@@ -141,7 +141,7 @@ async function facetManufacturersDb(): Promise<FacetOption[]> {
 async function facetModelGroupsDb(manufacturer: string): Promise<FacetOption[]> {
   return query<FacetOption>(
     `select model_group as value, count(*)::int as count from cars
-     where active and detail_fetched_at is not null and manufacturer = $1 and model_group is not null group by 1 order by 1`,
+     where active and detail_fetched_at is not null and not is_dup and manufacturer = $1 and model_group is not null group by 1 order by 1`,
     [manufacturer],
   );
 }
@@ -149,14 +149,14 @@ async function facetModelGroupsDb(manufacturer: string): Promise<FacetOption[]> 
 async function facetModelsDb(manufacturer: string, modelGroup: string): Promise<FacetOption[]> {
   return query<FacetOption>(
     `select model as value, count(*)::int as count from cars
-     where active and detail_fetched_at is not null and manufacturer = $1 and model_group = $2 group by 1 order by count(*) desc`,
+     where active and detail_fetched_at is not null and not is_dup and manufacturer = $1 and model_group = $2 group by 1 order by count(*) desc`,
     [manufacturer, modelGroup],
   );
 }
 
 async function facetSimpleDb(column: 'color' | 'body'): Promise<FacetOption[]> {
   return query<FacetOption>(
-    `select ${column} as value, count(*)::int as count from cars where active and detail_fetched_at is not null and ${column} is not null
+    `select ${column} as value, count(*)::int as count from cars where active and detail_fetched_at is not null and not is_dup and ${column} is not null
      group by 1 order by count(*) desc`,
   );
 }
@@ -176,6 +176,10 @@ export interface CarFull extends CarCard {
   damaged_parts: number | null;
   owner_changes: number | null;
   spec_status: string | null;
+  spec_hp_peak: number | null; // пиковая мощность по Naver (для электромобилей)
+  spec_grade: string | null;   // комплектация по Naver, например «3.5 가솔린 터보 MHEV AWD»
+  spec_ice_hp: number | null;   // гибрид: мощность ДВС
+  spec_motor_hp: number | null; // гибрид: пиковая мощность электромотора
   city: string | null;
   modified_at: Date | null;
   active: boolean;
@@ -184,7 +188,7 @@ export interface CarFull extends CarCard {
 async function getCarDb(id: number): Promise<CarFull | null> {
   const rows = await query<CarFull>(
     `select ${CARD_COLUMNS}, c.model_group, c.transmission, c.form_year, c.color, c.body, c.seats, c.vin, c.vehicle_no, c.vehicle_id, c.photos,
-       c.insurance_krw, c.damaged_parts, c.owner_changes, s.status as spec_status, c.city, c.modified_at, c.active
+       c.insurance_krw, c.damaged_parts, c.owner_changes, s.status as spec_status, s.hp_max as spec_hp_peak, s.naver_grade as spec_grade, s.ice_hp as spec_ice_hp, s.motor_hp as spec_motor_hp, c.city, c.modified_at, c.active
      from cars c left join specs s on s.key = c.spec_key where c.id = $1`,
     [id],
   );
@@ -194,7 +198,7 @@ async function getCarDb(id: number): Promise<CarFull | null> {
 async function catalogStatsDb(): Promise<{ total: number; today: number }> {
   const [r] = await query<{ total: number; today: number }>(
     `select count(*)::int as total, count(*) filter (where first_seen_at > now() - interval '24 hours')::int as today
-     from cars where active and detail_fetched_at is not null`,
+     from cars where active and detail_fetched_at is not null and not is_dup`,
   );
   return r ?? { total: 0, today: 0 };
 }
@@ -202,7 +206,7 @@ async function catalogStatsDb(): Promise<{ total: number; today: number }> {
 async function latestCarsDb(limit = 8): Promise<CarCard[]> {
   return query<CarCard>(
     `select ${CARD_COLUMNS} from cars c left join specs s on s.key = c.spec_key
-     where c.active and c.price_rub is not null order by coalesce(c.modified_at, c.first_seen_at) desc limit $1`,
+     where c.active and c.price_rub is not null and not c.is_dup order by coalesce(c.modified_at, c.first_seen_at) desc limit $1`,
     [limit],
   );
 }

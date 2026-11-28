@@ -4,6 +4,9 @@ import { BASE_QUERY, fetchFacets, fetchList, fetchVehicle, fetchRecord, fetchIns
 import { mapListItem, mapDetail, CITIES, type CarListRow } from '../lib/encar/map';
 import { translateName, translateManufacturer, fixEnglish } from '../lib/encar/translate';
 import { resolveHp, extractVariant } from '../lib/naver/spec';
+import { ev30MinHp } from '../lib/pricing/customs';
+import { hybridMotorPeakHp, hybridCustomsHp, isMildHybridGrade } from '../lib/pricing/hybrid';
+import { mildHybridRule } from '../lib/pricing/mhev';
 import { loadRates } from '../lib/rates';
 import { loadSettings } from '../lib/settings';
 import { calcPrice } from '../lib/pricing/price';
@@ -338,6 +341,47 @@ export function specKey(c: { manufacturer_ko: string; model_ko: string; model_gr
   return [c.manufacturer_ko, c.model_group_ko ?? '', c.model_ko, c.form_year ?? '', c.fuel, cc, turbo, variant].join('|');
 }
 
+// ---------- Повторные объявления ----------
+// Encar часто выставляет одну машину несколько раз. Оставляем самое раннее объявление: повтором считаем
+// тот же vehicle_id Encar или полное совпадение модели, комплектации, даты, пробега, цены и цвета.
+export async function dedupeCars(): Promise<{ changed: number }> {
+  const rows = await query<{ n: number }>(
+    `with r as (
+       select id,
+         row_number() over (partition by vehicle_id order by id) as rn1,
+         row_number() over (partition by manufacturer, model, coalesce(badge, ''), year_month, mileage, price_krw, coalesce(color, '') order by id) as rn2
+       from cars where active and detail_fetched_at is not null
+     ), u as (
+       update cars c set is_dup = (r.rn1 > 1 or r.rn2 > 1)
+       from r where c.id = r.id and c.is_dup is distinct from (r.rn1 > 1 or r.rn2 > 1)
+       returning 1
+     )
+     select count(*)::int as n from u`,
+  );
+  return { changed: rows[0]?.n ?? 0 };
+}
+
+// Мягкие гибриды среди уже найденных мощностей (после обновления правил): ДВС + 30-мин мощность мотора, без запросов к Naver.
+export async function applyMildHybridRules(): Promise<{ updated: number }> {
+  const rows = await query<{ key: string; hp: number }>(
+    `select key, hp from specs where status in ('ok', 'ambiguous') and ice_hp is null and hp is not null
+       and split_part(key, '|', 5) in ('petrol', 'diesel')`,
+  );
+  let updated = 0;
+  for (const s of rows) {
+    const [makerKo, , modelKo, formYear, fuel, cc, , variant] = s.key.split('|');
+    const rule = mildHybridRule({ makerKo: makerKo || null, modelKo: modelKo ?? '', formYear: formYear ? Number(formYear) : null, cc: cc ? Number(cc) : null, variant: variant || null, fuel: fuel ?? '' });
+    if (!rule) continue;
+    await query(
+      `update specs set ice_hp = hp, motor_hp = $2, motor_source = 'table', hp = $3 where key = $1 and ice_hp is null and status <> 'manual'`,
+      [s.key, rule.motorHp, hybridCustomsHp(s.hp, rule.motorHp)],
+    );
+    await query('update cars set price_calc_at = null where spec_key = $1', [s.key]);
+    updated++;
+  }
+  return { updated };
+}
+
 // ---------- Мощность (Naver) ----------
 
 export async function syncSpecs(deadline: number): Promise<{ resolved: number; failed: number }> {
@@ -361,12 +405,25 @@ export async function syncSpecs(deadline: number): Promise<{ resolved: number; f
         variant: variant || null,
         makerKo: makerKo || null,
       });
-      // Для электромобилей таможня берёт 30-минутную мощность, а у Naver — пиковая: помечаем на проверку.
-      const status = r ? (fuel === 'electric' || fuel === 'hydrogen' ? 'ambiguous' : r.status) : 'not_found';
+      // Для электромобилей таможня берёт 30-минутную мощность, а у Naver — пиковая. Пока 30-минутная
+      // не подтверждена, считаем как таможня: 45% пиковой; модель остаётся в админке на проверку.
+      // Гибриды (и мягкие гибриды MHEV): мощность ДВС + 30-минутная мощность электромотора (45% пиковой).
+      const ev = fuel === 'electric' || fuel === 'hydrogen';
+      const mhev = mildHybridRule({ makerKo: makerKo || null, modelKo: modelKo ?? '', formYear: formYear ? Number(formYear) : null, cc: cc ? Number(cc) : null, variant: variant || null, fuel: fuel ?? '' });
+      const mild = r != null && (isMildHybridGrade(r.grade) || mhev != null);
+      const hybrid = !ev && r != null && (fuel === 'hybrid' || fuel === 'diesel_hybrid' || mild);
+      const motor = hybrid && r
+        ? hybridMotorPeakHp({ makerKo: makerKo || null, cc: cc ? Number(cc) : null, turbo: turbo === 'T' || /터보|turbo|T-?GDi/i.test(r.grade), mild, naverMotorHp: r.motorHp, mildMotorHp: mhev?.motorHp })
+        : null;
+      let status: string = r ? (ev ? 'ambiguous' : r.status) : 'not_found';
+      if (motor?.source === 'default') status = 'ambiguous';
+      const hp = r ? (ev ? ev30MinHp(r.hpMax) : motor ? hybridCustomsHp(r.hp, motor.peak) : r.hp) : null;
       await query(
-        `update specs set hp = $2, hp_min = $3, hp_max = $4, status = $5, naver_grade = $6, naver_model = $7, checked_at = now()
+        `update specs set hp = $2, hp_min = $3, hp_max = $4, status = $5, naver_grade = $6, naver_model = $7, checked_at = now(),
+           ice_hp = $8, motor_hp = $9, motor_source = $10
          where key = $1 and status <> 'manual'`,
-        [s.key, r?.hp ?? null, r?.hpMin ?? null, r?.hpMax ?? null, status, r?.grade ?? null, r?.query ?? null],
+        [s.key, hp, r?.hpMin ?? null, r?.hpMax ?? null, status, r?.grade ?? null, r?.query ?? null,
+          motor && r ? r.hp : null, motor?.peak ?? null, motor?.source ?? null],
       );
       await query('update cars set price_calc_at = null where spec_key = $1', [s.key]);
       if (r) resolved++; else failed++;

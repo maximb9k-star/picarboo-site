@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
-import { isAdmin } from '@/lib/session';
+import { isAdmin, pendingTwoFa } from '@/lib/session';
 import { loadSettings } from '@/lib/settings';
 import { query } from '@/lib/db';
-import { login, logout, saveSettings, setSpecHp, saveTelegram, detectChatId, saveDomains } from './actions';
+import { login, verifyCode, logout, saveSettings, setSpecHp, saveTelegram, detectChatId, saveDomains } from './actions';
 import { siteDomains } from '@/lib/site';
 import { getTelegramConfig } from '@/lib/telegram';
 
@@ -17,12 +17,34 @@ export default async function AdminPage({ searchParams }: { searchParams: SP }) 
     return <Box><p>Задайте ADMIN_PASSWORD и SESSION_SECRET в файле .env на сервере.</p></Box>;
   }
   if (!(await isAdmin())) {
+    const errors: Record<string, string> = {
+      '1': 'Неверный пароль',
+      locked: 'Слишком много неудачных попыток. Попробуйте через 15 минут.',
+      tg: 'Не удалось отправить код в Telegram. Попробуйте ещё раз через минуту.',
+      code: 'Неверный код. Проверьте последнее сообщение от бота.',
+      expired: 'Код устарел. Введите пароль ещё раз — придёт новый код.',
+    };
+    const err = sp.error ? errors[sp.error] ?? errors['1'] : null;
+    if (await pendingTwoFa()) {
+      return (
+        <Box>
+          <form action={verifyCode} className="space-y-3">
+            <div className="text-lg font-bold">Код подтверждения</div>
+            <p className="text-sm text-ink/60">Мы отправили 6‑значный код в ваш Telegram. Он действует 5 минут.</p>
+            <input name="code" className="input text-center text-xl tracking-[.4em]" placeholder="000000" inputMode="numeric" autoComplete="one-time-code" maxLength={6} autoFocus />
+            {err && <p className="text-sm text-red-600">{err}</p>}
+            <button className="btn-dark w-full">Подтвердить</button>
+          </form>
+          <form action={logout} className="mt-2"><button className="btn-ghost w-full !py-2">Начать заново</button></form>
+        </Box>
+      );
+    }
     return (
       <Box>
         <form action={login} className="space-y-3">
           <div className="text-lg font-bold">Вход в админку</div>
-          <input name="password" type="password" className="input" placeholder="Пароль" autoFocus />
-          {sp.error && <p className="text-sm text-red-600">Неверный пароль</p>}
+          <input name="password" type="password" className="input" placeholder="Пароль" autoComplete="current-password" autoFocus />
+          {err && <p className="text-sm text-red-600">{err}</p>}
           <button className="btn-dark w-full">Войти</button>
         </form>
       </Box>
@@ -59,6 +81,7 @@ export default async function AdminPage({ searchParams }: { searchParams: SP }) 
   };
   const specCounts = await query<{ status: string; n: number }>('select status, count(*)::int as n from specs group by status');
   const st = stats[0]!;
+  const naverRate = rates.find((r) => r.code === 'RUB_KRW_REMIT');
 
   return (
     <div className="container-x space-y-6 py-8">
@@ -71,7 +94,10 @@ export default async function AdminPage({ searchParams }: { searchParams: SP }) 
       {sp.tg && <div className="rounded-xl bg-lime/30 p-3 text-sm font-semibold">{tgMsg[sp.tg] ?? ''}</div>}
 
       <section className="card p-5">
-        <h2 className="text-lg font-bold">Telegram: заявки и вход</h2>
+        <h2 className="text-lg font-bold">Telegram: заявки, вход и защита админки</h2>
+        {tg.token && tg.chatId
+          ? <p className="mt-2 rounded-xl bg-lime/30 p-3 text-sm font-semibold">Двухфакторный вход включён: после пароля код приходит вам в Telegram.</p>
+          : <p className="mt-2 rounded-xl bg-red-50 p-3 text-sm font-semibold text-red-700">Двухфакторный вход выключен. Подключите бота ниже — после этого вход в админку будет только с кодом из Telegram.</p>}
         <ol className="mt-2 list-decimal space-y-1 pl-5 text-sm text-ink/65">
           <li>В Telegram откройте @BotFather → /newbot → скопируйте токен и имя бота.</li>
           <li>Вставьте ниже и сохраните. Затем откройте своего бота, нажмите Start и нажмите «Найти мой chat_id».</li>
@@ -117,7 +143,18 @@ export default async function AdminPage({ searchParams }: { searchParams: SP }) 
             <Field name="depositKrw" label="Залог, ₩ (пусто — не показывать)" value={s.depositKrw ?? ''} />
             <Field name="inspectionCostKrw" label="Осмотр при отказе, ₩" value={s.inspectionCostKrw} />
             <Field name="freeInspections" label="Бесплатных осмотров" value={s.freeInspections} />
-            <Field name="rubKrwOverride" label="Курс вручную, ₩ за 1 ₽ (пусто — Naver)" value={s.rubKrwOverride ?? ''} />
+            <Field name="rubKrwOverride" label="Курс для авто и расходов по Корее, ₩ за 1 ₽" value={s.rubKrwOverride ?? ''} />
+            <div className="self-end pb-2 text-xs text-ink/55">
+              {naverRate ? <>Naver сейчас: 1 ₽ = {Number(naverRate.value).toFixed(2)} ₩ (только для справки)</> : null}
+            </div>
+            {!s.rubKrwOverride && (
+              <p className="rounded-xl bg-red-50 p-3 text-sm font-semibold text-red-700 sm:col-span-2">
+                Курс не задан — пока цены считаются по курсу Naver. Впишите свой курс и сохраните.
+              </p>
+            )}
+            <p className="text-xs text-ink/55 sm:col-span-2">
+              По этому курсу считаются стоимость авто и расходы по Корее. Таможня и утильсбор всегда считаются по курсу ЦБ РФ, как в калькуляторах ТКС и Calcus.
+            </p>
             <button className="btn-dark sm:col-span-2">Сохранить и пересчитать</button>
           </form>
         </section>
@@ -147,7 +184,7 @@ export default async function AdminPage({ searchParams }: { searchParams: SP }) 
 
       <section className="card p-5">
         <h2 className="text-lg font-bold">Мощность на проверку</h2>
-        <p className="mb-4 mt-1 text-sm text-ink/60">Naver не нашёл комплектацию или вариантов несколько. Пока мощность не подтверждена, расчёт идёт по максимальной (неоднозначные) или цена скрыта (не найдено). Для электромобилей укажите 30‑минутную мощность.</p>
+        <p className="mb-4 mt-1 text-sm text-ink/60">Naver не нашёл комплектацию или вариантов несколько. Пока мощность не подтверждена, расчёт идёт по максимальной (неоднозначные) или цена скрыта (не найдено). Гибриды и мягкие гибриды: мощность для таможни = ДВС + 30‑минутная мощность электромотора (45% пиковой). Если Naver не знает мощность мотора, расчёт идёт с запасом (80 л.с. пиковой для гибрида, 20 — для мягкого) — впишите итоговую мощность. Электромобили и водородные: таможня считает 30‑минутную мощность. Пока она не подтверждена, расчёт идёт по 45% пиковой (так делает таможня без данных испытаний) — впишите точную 30‑минутную мощность, если знаете.</p>
         <div className="overflow-x-auto">
           <table className="w-full min-w-[720px] text-sm">
             <thead className="text-left text-xs uppercase text-ink/40"><tr><th>Модель (Encar)</th><th>Статус</th><th>Naver</th><th>Авто</th><th>Л.с.</th></tr></thead>

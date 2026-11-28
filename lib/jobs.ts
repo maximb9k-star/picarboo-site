@@ -2,7 +2,7 @@
 // или в цикле фоновым процессом (npm run worker). Всё состояние — в базе, тики можно прерывать.
 import { query } from './db';
 import { refreshRates } from './rates';
-import { syncNames, retranslateAll, syncList, syncFullStep, syncDetails, syncSpecs, repriceAll, getState, setState } from '../worker/sync';
+import { syncNames, retranslateAll, syncList, syncFullStep, syncDetails, syncSpecs, repriceAll, dedupeCars, getState, setState } from '../worker/sync';
 
 const MIN = 60_000;
 
@@ -52,6 +52,7 @@ export async function tick(budgetMs = 50_000): Promise<Record<string, unknown>> 
     if (left() > 20_000) await step('list_full', () => syncFullStep(deadline - 12_000));
   }
   if (left() > 10_000) await step('details', () => syncDetails(deadline - 8_000));
+  if (left() > 5_000) await step('dedupe', () => dedupeCars());
   if (left() > 12_000) await step('specs', () => syncSpecs(deadline - 4_000));
   if (left() > 3_000) await step('reprice', () => repriceAll(true, deadline - 1_500));
 

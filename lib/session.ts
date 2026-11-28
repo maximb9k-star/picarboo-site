@@ -44,7 +44,13 @@ export async function isAdmin(): Promise<boolean> {
   return verify<{ admin: true }>((await cookies()).get(ADMIN_COOKIE)?.value)?.admin === true;
 }
 
-export const COOKIE_NAMES = { user: USER_COOKIE, admin: ADMIN_COOKIE };
+export const COOKIE_NAMES = { user: USER_COOKIE, admin: ADMIN_COOKIE, twoFa: 'pb_admin_2fa' };
+
+// Пароль уже введён, ждём код из Telegram.
+export async function pendingTwoFa(): Promise<boolean> {
+  if (!process.env.SESSION_SECRET) return false;
+  return verify<{ n: string }>((await cookies()).get(COOKIE_NAMES.twoFa)?.value) != null;
+}
 
 // Проверка данных виджета Telegram Login: https://core.telegram.org/widgets/login#checking-authorization
 export function checkTelegramAuth(data: Record<string, string>, botToken: string, maxAgeSec = 86400): boolean {

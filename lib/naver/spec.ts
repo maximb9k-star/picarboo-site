@@ -6,6 +6,7 @@ export interface NaverGrade {
   cc: number;
   fuel: string;      // как у Naver: 가솔린 | 디젤 | LPG | 전기 | 수소 ...
   hp: number;        // мощность ДВС (для электро — мотора), л.с.
+  motorHp?: number;  // пиковая мощность электромотора гибрида, л.с. (0 — Naver не знает)
   turbo: boolean;
   awd: boolean;
 }
@@ -67,6 +68,7 @@ export function parseGrades(html: string): NaverGrade[] {
       cc,
       fuel: engineHp > 0 ? fuel : '전기',
       hp,
+      motorHp: engineHp > 0 ? motorHp : 0,
       turbo: (g.engine?.superChargingType?.values ?? []).some((v) => v.includes('터보')),
       awd: /사륜|4륜|AWD|4WD/.test(drive) || /AWD|4WD|xDrive|4MATIC|quattro|HTRAC/i.test(g.name ?? ''),
     });
@@ -87,6 +89,7 @@ export interface MatchResult {
   hpMax: number;
   status: 'ok' | 'ambiguous';
   grade: string;
+  motorHp: number;   // пиковая мощность электромотора выбранной комплектации (0 — нет данных)
 }
 
 const FUEL_TO_NAVER: Record<string, string[]> = {
@@ -118,7 +121,8 @@ export function matchGrade(grades: NaverGrade[], input: MatchInput): MatchResult
   const hpMax = Math.max(...hps);
   // Если варианты различаются — берём максимум: цена не окажется ниже реальной («никаких сюрпризов»).
   const best = cand.find((g) => Math.round(g.hp) === hpMax)!;
-  return { hp: hpMax, hpMin, hpMax, status: hpMax - hpMin > 5 ? 'ambiguous' : 'ok', grade: best.name };
+  const motorHp = Math.max(0, ...cand.map((g) => Math.round(g.motorHp ?? 0)));
+  return { hp: hpMax, hpMin, hpMax, status: hpMax - hpMin > 5 ? 'ambiguous' : 'ok', grade: best.name, motorHp };
 }
 
 // Обозначение версии в комплектации Encar: «520i M 스포츠» → 520i, «GLC300 4MATIC» → GLC300, «35 TDI» → 35TDI.

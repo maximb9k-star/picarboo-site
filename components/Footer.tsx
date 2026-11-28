@@ -10,7 +10,7 @@ export function Footer() {
       <div className="container-x grid gap-10 py-12 md:grid-cols-[1.3fr_1fr_1fr]">
         <div>
           <Logo />
-          <p className="mt-4 max-w-sm text-sm leading-relaxed">Экспорт автомобилей из Южной Кореи напрямую. Подбор на Encar, осмотр, выкуп, доставка во Владивосток и растаможка.</p>
+          <p className="mt-4 max-w-sm text-sm leading-relaxed">Экспорт автомобилей из Южной Кореи напрямую, без посредников. Подбор по всей Корее, осмотр, выкуп, растаможка и доставка до вашего дома.</p>
         </div>
         <div>
           <div className="mb-3 text-xs font-semibold uppercase tracking-wider text-white/40">Разделы</div>

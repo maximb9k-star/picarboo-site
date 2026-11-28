@@ -12,7 +12,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     `select distinct manufacturer, model_group from cars where active and price_rub is not null`,
   );
   const cars = await query<{ id: number; modified_at: Date | null }>(
-    'select id, modified_at from cars where active and price_rub is not null order by modified_at desc nulls last limit 40000',
+    'select id, modified_at from cars where active and price_rub is not null and not is_dup order by modified_at desc nulls last limit 40000',
   );
   return [
     ...pages,

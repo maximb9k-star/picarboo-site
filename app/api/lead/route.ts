@@ -2,16 +2,14 @@ import { NextResponse } from 'next/server';
 import { leadSchema, createLead } from '@/lib/leads';
 import { getUser } from '@/lib/session';
 import { siteUrl } from '@/lib/site';
+import { rateLimit, ipFrom } from '@/lib/ratelimit';
 
-// Простая защита от спама: не больше 5 заявок с одного IP за 10 минут.
-const hits = new Map<string, number[]>();
-
+// Защита от спама: не больше 5 заявок с одного IP за 10 минут и 60 со всех IP за 10 минут.
 export async function POST(req: Request) {
-  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'local';
-  const now = Date.now();
-  const recent = (hits.get(ip) ?? []).filter((t) => now - t < 10 * 60_000);
-  if (recent.length >= 5) return NextResponse.json({ error: 'Слишком много заявок, попробуйте позже' }, { status: 429 });
-  hits.set(ip, [...recent, now]);
+  const ip = ipFrom(req.headers);
+  if (!rateLimit(`lead:${ip}`, 5, 10 * 60_000) || !rateLimit('lead:all', 60, 10 * 60_000)) {
+    return NextResponse.json({ error: 'Слишком много заявок, попробуйте позже' }, { status: 429 });
+  }
 
   const body = (await req.json().catch(() => null)) as unknown;
   const parsed = leadSchema.safeParse(body);

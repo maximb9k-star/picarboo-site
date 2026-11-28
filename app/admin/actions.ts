@@ -3,10 +3,13 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import crypto from 'node:crypto';
 import { revalidatePath } from 'next/cache';
-import { sign, isAdmin, COOKIE_NAMES } from '@/lib/session';
+import { sign, verify, isAdmin, COOKIE_NAMES } from '@/lib/session';
 import { saveSetting } from '@/lib/settings';
 import { query } from '@/lib/db';
 import { clearMemo } from '@/lib/memo';
+import { rateLimit, clientIp } from '@/lib/ratelimit';
+import { issueCode, checkCode, TWO_FA_TTL_SEC } from '@/lib/admin2fa';
+import { getTelegramConfig, notifyAdmin, escapeHtml } from '@/lib/telegram';
 
 function intOrNull(v: FormDataEntryValue | null): number | null {
   const s = String(v ?? '').replace(/[\s₩₽,]/g, '');
@@ -15,19 +18,56 @@ function intOrNull(v: FormDataEntryValue | null): number | null {
   return Number.isFinite(n) && n >= 0 ? Math.round(n) : null;
 }
 
+// Защита от перебора: 5 неудачных попыток с одного IP за 15 минут, 30 — со всех IP за 15 минут.
+const FAIL_WINDOW = 15 * 60_000;
+const cookieOpts = (maxAge: number) => ({
+  httpOnly: true, sameSite: 'strict' as const, secure: process.env.NODE_ENV === 'production', path: '/', maxAge,
+});
+
+async function grantAdmin(ip: string): Promise<never> {
+  (await cookies()).set(COOKIE_NAMES.admin, sign({ admin: true, exp: Math.floor(Date.now() / 1000) + 7 * 86400 }), cookieOpts(7 * 86400));
+  (await cookies()).delete(COOKIE_NAMES.twoFa);
+  await notifyAdmin(`🔐 PICARBOO: выполнен вход в админку (IP ${escapeHtml(ip)}). Если это были не вы — смените ADMIN_PASSWORD.`);
+  redirect('/admin');
+}
+
 export async function login(form: FormData): Promise<void> {
+  const ip = await clientIp();
+  if (!rateLimit(`login:${ip}`, 5, FAIL_WINDOW, false) || !rateLimit('login:all', 30, FAIL_WINDOW, false)) redirect('/admin?error=locked');
   const pass = String(form.get('password') ?? '');
   const expected = process.env.ADMIN_PASSWORD ?? '';
   const ok = expected.length > 0 && pass.length === expected.length && crypto.timingSafeEqual(Buffer.from(pass), Buffer.from(expected));
-  if (!ok) redirect('/admin?error=1');
-  (await cookies()).set(COOKIE_NAMES.admin, sign({ admin: true, exp: Math.floor(Date.now() / 1000) + 7 * 86400 }), {
-    httpOnly: true, sameSite: 'strict', secure: process.env.NODE_ENV === 'production', path: '/', maxAge: 7 * 86400,
-  });
+  if (!ok) {
+    rateLimit(`login:${ip}`, 5, FAIL_WINDOW);
+    rateLimit('login:all', 30, FAIL_WINDOW);
+    redirect('/admin?error=1');
+  }
+  // Второй шаг — код в Telegram, если бот и chat_id администратора настроены.
+  const tg = await getTelegramConfig();
+  if (!tg.token || !tg.chatId) await grantAdmin(ip);
+  const [nonce, code] = issueCode();
+  const sent = await notifyAdmin(`🔐 Код входа в админку PICARBOO: <b>${code}</b>\nДействует 5 минут. IP: ${escapeHtml(ip)}.\nНикому не сообщайте этот код.`);
+  if (!sent) redirect('/admin?error=tg');
+  (await cookies()).set(COOKIE_NAMES.twoFa, sign({ n: nonce, exp: Math.floor(Date.now() / 1000) + TWO_FA_TTL_SEC }), cookieOpts(TWO_FA_TTL_SEC));
   redirect('/admin');
+}
+
+export async function verifyCode(form: FormData): Promise<void> {
+  const ip = await clientIp();
+  const pending = verify<{ n: string }>((await cookies()).get(COOKIE_NAMES.twoFa)?.value);
+  if (!pending) redirect('/admin?error=expired');
+  const r = checkCode(pending.n, String(form.get('code') ?? ''));
+  if (r === 'ok') await grantAdmin(ip);
+  if (r === 'expired') {
+    (await cookies()).delete(COOKIE_NAMES.twoFa);
+    redirect('/admin?error=expired');
+  }
+  redirect('/admin?error=code');
 }
 
 export async function logout(): Promise<void> {
   (await cookies()).delete(COOKIE_NAMES.admin);
+  (await cookies()).delete(COOKIE_NAMES.twoFa);
   redirect('/admin');
 }
 

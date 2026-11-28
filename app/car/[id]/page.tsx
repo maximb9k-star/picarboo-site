@@ -16,6 +16,7 @@ import { FavoriteButton } from '@/components/FavoriteButton';
 import { TelegramLogin } from '@/components/TelegramLogin';
 import { RateBadge } from '@/components/CarCard';
 import { liveDetail, livePrice } from '@/lib/live';
+import { ev30MinHp } from '@/lib/pricing/customs';
 import { siteUrl } from '@/lib/site';
 
 export const dynamic = 'force-dynamic';
@@ -59,6 +60,12 @@ export default async function CarPage({ params }: Props) {
   const vehicleNo = live?.vehicle_no ?? car.vehicle_no;
   const active = car.active && !gone;
   const hpPending = car.spec_status === 'pending' && !car.hp;
+  const ev = car.fuel === 'electric' || car.fuel === 'hydrogen';
+  const mildHybrid = /MHEV|마일드/i.test(car.spec_grade ?? '') || ((car.fuel === 'petrol' || car.fuel === 'diesel') && !!car.spec_motor_hp);
+  // Гибрид: ДВС + 30-минутная мощность электромотора (45% пиковой).
+  const hybridHp = !ev && car.spec_status !== 'manual' && car.spec_ice_hp && car.spec_motor_hp
+    ? ` (ДВС ${car.spec_ice_hp} + электромотор ${ev30MinHp(car.spec_motor_hp)} л.с. за 30 мин)`
+    : null;
   const tgText = encodeURIComponent(`Здравствуйте! Интересует ${title} (${car.price_rub ? rub(car.price_rub) : krw(car.price_krw)}): ${await siteUrl()}/car/${car.id}`);
   const locked = (v: React.ReactNode) => (unlocked ? v : <span className="text-ink/40">войдите, чтобы увидеть</span>);
 
@@ -96,9 +103,9 @@ export default async function CarPage({ params }: Props) {
               <Item k="Дата регистрации" v={yearMonth(car.year_month)} />
               <Item k="Модельный год" v={car.form_year ?? '—'} />
               <Item k="Пробег" v={km(car.mileage)} />
-              <Item k="Топливо" v={FUEL_LABEL[car.fuel]} />
+              <Item k="Топливо" v={mildHybrid ? `${FUEL_LABEL[car.fuel]}, мягкий гибрид (MHEV)` : FUEL_LABEL[car.fuel]} />
               <Item k="Объём двигателя" v={car.displacement && car.fuel !== 'electric' ? `${car.displacement.toLocaleString('ru-RU')} см³` : '—'} />
-              <Item k="Мощность" v={locked(car.hp ? `${car.hp} л.с.` : 'уточняется')} />
+              <Item k={ev ? 'Мощность (30 мин, для таможни)' : hybridHp ? 'Мощность для таможни' : 'Мощность'} v={locked(car.hp ? `${car.hp} л.с.${hybridHp ?? ''}${ev && car.spec_status !== 'manual' && car.spec_hp_peak ? ` (≈45% от пиковой ${car.spec_hp_peak} л.с.)` : ''}` : 'уточняется')} />
               <Item k="Коробка" v={car.transmission ?? '—'} />
               <Item k="Привод" v={car.awd ? 'полный' : 'не указан'} />
               <Item k="Цвет" v={car.color ?? '—'} />

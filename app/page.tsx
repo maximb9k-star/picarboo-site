@@ -4,6 +4,7 @@ import { CarCard } from '@/components/CarCard';
 import { LogoMark } from '@/components/Logo';
 import { LeadForm } from '@/components/LeadForm';
 import { QuickSearch } from '@/components/QuickSearch';
+import { SoldCars } from '@/components/SoldCars';
 import { contacts } from '@/lib/contacts';
 import { ADVANTAGES, STEPS_SHORT } from '@/lib/content';
 
@@ -18,12 +19,12 @@ export default async function Home() {
         <div className="pointer-events-none absolute -right-24 -top-24 opacity-[.07]"><LogoMark className="h-[420px] w-auto" /></div>
         <div className="container-x relative grid gap-10 py-12 sm:py-16 lg:grid-cols-[1.1fr_1fr] lg:py-20">
           <div>
-            <span className="chip bg-lime/15 text-lime">🇰🇷 Экспортёр авто из Кореи напрямую</span>
+            <span className="chip bg-lime/15 text-lime">Экспортёр авто из Кореи напрямую</span>
             <h1 className="mt-5 text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-5xl lg:text-6xl">
               Авто из Кореи<br /><span className="text-lime">под ключ</span> без комиссии
             </h1>
             <p className="mt-5 max-w-xl text-base leading-relaxed text-white/70 sm:text-lg">
-              Весь рынок Encar с честной ценой до Владивостока: растаможка, утильсбор и доставка уже посчитаны. Осматриваем, выкупаем и отправляем сами.
+              Ищем автомобили по всей Корее — на Encar, у дилеров и на других площадках. Цена до Владивостока с растаможкой, утильсбором и доставкой уже посчитана. Осматриваем, выкупаем и отправляем сами, без посредников.
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
               <Link href="/catalog" className="btn-lime px-6 py-3.5 text-base">Смотреть каталог</Link>
@@ -89,10 +90,12 @@ export default async function Home() {
         </div>
       </section>
 
+      <SoldCars limit={6} />
+
       <section className="container-x grid gap-6 py-6 lg:grid-cols-2">
         <div className="card p-6 sm:p-8">
           <h2 className="h-section">Не нашли подходящее?</h2>
-          <p className="mt-2 text-ink/65">Напишите модель и бюджет — подберём варианты на Encar, пришлём расчёт под ключ и проверим историю каждой машины.</p>
+          <p className="mt-2 text-ink/65">Напишите модель и бюджет — подберём варианты по всей Корее, пришлём расчёт под ключ и проверим историю каждой машины.</p>
           <div className="mt-6 flex flex-wrap gap-2">
             <a href={c.telegramUrl} target="_blank" rel="noopener" className="btn-dark">Telegram {c.telegram}</a>
             <a href={c.whatsappUrl} target="_blank" rel="noopener" className="btn-ghost">WhatsApp</a>

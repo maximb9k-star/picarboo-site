@@ -71,7 +71,7 @@ export function PriceBox({ calc, priceKrw, hpPending }: { calc: PriceBreakdown |
             <Row label="Итого таможня" value={rub(c.total)} strong />
           </Group>
           <div className="rounded-xl bg-paper p-3 text-xs leading-relaxed text-ink/60">
-            Курс оплаты: 1 ₽ = {calc.rates.rubKrwRemit.toLocaleString('ru-RU')} ₩ (Naver, перевод в Корею). Таможня — по курсу ЦБ: 1 € = {calc.rates.eurRub.toLocaleString('ru-RU', { maximumFractionDigits: 2 })} ₽.
+            Стоимость авто и расходы по Корее — по курсу компании: 1 ₽ = {calc.rates.rubKrwRemit.toLocaleString('ru-RU')} ₩. Таможня и утильсбор — по курсу ЦБ РФ: 1 € = {calc.rates.eurRub.toLocaleString('ru-RU', { maximumFractionDigits: 2 })} ₽, 1000 ₩ = {(calc.rates.krwRub * 1000).toLocaleString('ru-RU', { maximumFractionDigits: 2 })} ₽.
             Возраст авто для таможни: {Math.floor(calc.ageMonths / 12)} г. {calc.ageMonths % 12} мес. Итоговую сумму пошлин определяет таможня по курсу на дату оформления.
           </div>
         </div>
